@@ -88,9 +88,11 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
       📄 閱讀工會章程（另開視窗）
     </button>
     <div class="before-note">
-      <strong>入會與會費說明</strong><br>
+      <strong>入會與會費說明 / Membership &amp; Union Fee Information</strong><br><br>
       入會費：新臺幣 500 元，僅於入會時收取一次。<br>
-      每月經常會費：新臺幣 200 元，同意薪資代扣後，由公司每月自薪資代扣並轉交工會。
+      <strong>Registration Fee:</strong> NT$500, charged once only upon joining the Union.<br><br>
+      每月經常會費：新臺幣 200 元，同意薪資代扣後，由公司每月自薪資代扣並轉交工會。<br>
+      <strong>Monthly Union Dues:</strong> NT$200. After payroll deduction is authorized, the Company will deduct the dues from the member's monthly salary and remit them to the Union.
     </div>
     <div class="intro-checks">
       <label><input type="checkbox" class="introConsent">我已閱讀工會章程。</label>
@@ -128,12 +130,18 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
 </div>
 
 <div class="notice">
-  <label class="agree"><input id="agree" type="checkbox"><span>我已詳閱並同意工會章程及會費代扣條款。<small>I have read and agree to the union bylaws and the withholding of dues.</small></span></label>
-  <div class="statement">
-    本人同意按工會章程行使權利與義務，並同意自加入工會成為會員之日起，由任職公司依工會章程所定會費標準，自每月薪資代扣工會經常會費；於本人退會或離職後停止代扣。
-    <div class="en">I agree to exercise my rights and fulfill my obligations in accordance with the union bylaws. I also agree that, from the date I become a member, the employer may deduct regular union dues from my monthly salary in accordance with the union bylaws. The deduction will cease upon termination of membership or employment.</div>
-  </div>
-</div>
+      <label class="consent-check">
+        <input type="checkbox" id="agree">
+        <span><strong>經常會費薪資代扣同意 / Authorization for Payroll Deduction of Monthly Union Dues</strong></span>
+      </label>
+      <div style="margin-top:12px;line-height:1.7">
+        本人為台灣美光晶圓科技股份有限公司企業工會會員，同意依工會法第 28 條第 3 項規定，自本人提出申請後，於應繳經常會費當月，由台灣美光晶圓科技股份有限公司自本人每月薪資中代扣工會每月經常會費新臺幣 200 元，並將扣取之會費轉交工會。<br><br>
+        如本人當月薪資不足扣款，則依工會其他繳費方式辦理。如本人欲改以其他方式繳納經常會費，將自行向工會提出取消薪資代扣會費之申請，再由公司停止自本人薪資中扣取工會經常會費。<br><br>
+        <strong>English</strong><br>
+        I am a member of the Taiwan Micron Technology, Inc. Enterprise Union. In accordance with Article 28, Paragraph 3 of the Labor Union Act, I authorize Taiwan Micron Technology, Inc., after this application is submitted, to deduct the monthly Union dues of NT$200 from my salary in the month in which the dues are payable and remit the deducted dues to the Union.<br><br>
+        If my salary for a given month is insufficient for the deduction, I will pay the dues using another payment method provided by the Union. If I wish to change to another method of paying the monthly Union dues, I will submit a request to the Union to cancel the payroll deduction authorization, after which the Company will stop deducting the monthly Union dues from my salary.
+      </div>
+    </div>
 
 
 <div class="feeinfo">
@@ -371,16 +379,16 @@ async function downloadPDF(){
  g.fillRect(x,sy,W,292);g.strokeRect(x,sy,W,292);
  g.textAlign='left';g.fillStyle='#8b6500';
  g.font='bold 28px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- g.fillText('☑ 我已詳閱並同意工會章程及會費代扣條款。',x+22,sy+42);
+ g.fillText('☑ 經常會費薪資代扣同意',x+22,sy+42);
  g.font='20px Arial,sans-serif';
- g.fillText('I have read and agree to the union bylaws and the withholding of dues.',x+22,sy+72);
+ g.fillText('Authorization for Payroll Deduction of Monthly Union Dues',x+22,sy+72);
 
  g.fillStyle='#26333c';g.font='23px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- const zh='本人同意按工會章程行使權利與義務，並同意自加入工會成為會員之日起，由任職公司依工會章程所定會費標準，自每月薪資代扣工會經常會費；於本人退會或離職後停止代扣。';
+ const zh='本人同意依工會法第 28 條第 3 項規定，由台灣美光晶圓科技股份有限公司自本人每月薪資中代扣工會每月經常會費新臺幣 200 元，並將扣取之會費轉交工會。';
  wrap(g,zh,W-44).forEach((t,i)=>g.fillText(t,x+22,sy+111+i*33));
 
  g.font='18px Arial,sans-serif';g.fillStyle='#4f5961';
- const en='I agree to exercise my rights and fulfill my obligations in accordance with the union bylaws. I also agree that, from the date I become a member, the employer may deduct regular union dues from my monthly salary in accordance with the union bylaws. The deduction will cease upon termination of membership or employment.';
+ const en='I authorize Taiwan Micron Technology, Inc. to deduct monthly Union dues of NT$200 from my salary and remit the deducted dues to the Union in accordance with Article 28, Paragraph 3 of the Labor Union Act.';
  const words=en.split(' ');let line='',lines=[];
  for(const word of words){const t=line?line+' '+word:word;if(g.measureText(t).width>W-44&&line){lines.push(line);line=word}else line=t}
  if(line)lines.push(line);
