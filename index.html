@@ -337,7 +337,7 @@ async function downloadPDF(){
  g.strokeStyle='#111';drawLine(g,55,225,1185,225,6);
 
  const x=55,y=255,W=1130,H=120,half=565;
- box(g,x,y,half,H,'姓名','Chinese Name',v('name'));
+ box(g,x,y,half,H,'姓名','Name',v('name'));
  box(g,x+half,y,half,H,'性別','Gender',v('gender'));
  box(g,x,y+H,half,H,'工號','Worker No.',v('workerNo'));
  box(g,x+half,y+H,half,H,'出生年月日（西元）','Birthdate (Gregorian)',`${v('birthY')} 年 ${v('birthM')} 月 ${v('birthD')} 日`);
