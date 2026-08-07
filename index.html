@@ -307,19 +307,36 @@ function box(ctx,x,y,w,h,labelZh,labelEn,value){
  ctx.font='17px Arial,sans-serif';ctx.fillStyle='#4f5961';ctx.fillText(labelEn,x+15,y+54);
  ctx.font='27px "Microsoft JhengHei","Noto Sans TC",sans-serif';ctx.fillStyle='#111';ctx.fillText(value||'',x+15,y+90);
 }
-function jpegPdf(jpeg,w,h){
+function jpegPdfPages(images,w,h){
  const enc=new TextEncoder(),chunks=[],offs=[0];let len=0;
  const push=s=>{const b=typeof s==='string'?enc.encode(s):s;chunks.push(b);len+=b.length};
  push('%PDF-1.4\n');
  function obj(n,parts){offs[n]=len;push(n+' 0 obj\n');parts.forEach(push);push('\nendobj\n')}
+
+ const count=images.length;
+ const pageObjs=[],imgObjs=[],contentObjs=[];
+ let next=3;
+ for(let i=0;i<count;i++){
+   pageObjs.push(next++);
+   imgObjs.push(next++);
+   contentObjs.push(next++);
+ }
+
  obj(1,['<< /Type /Catalog /Pages 2 0 R >>']);
- obj(2,['<< /Type /Pages /Kids [3 0 R] /Count 1 >>']);
- obj(3,['<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>']);
- obj(4,[`<< /Type /XObject /Subtype /Image /Width ${w} /Height ${h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`,jpeg,'\nendstream']);
- const content=enc.encode('q\n595.28 0 0 841.89 0 0 cm\n/Im0 Do\nQ\n');
- obj(5,[`<< /Length ${content.length} >>\nstream\n`,content,'endstream']);
- const xref=len;push('xref\n0 6\n0000000000 65535 f \n');for(let i=1;i<=5;i++)push(String(offs[i]).padStart(10,'0')+' 00000 n \n');
- push(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
+ obj(2,[`<< /Type /Pages /Kids [${pageObjs.map(n=>n+' 0 R').join(' ')}] /Count ${count} >>`]);
+
+ for(let i=0;i<count;i++){
+   obj(pageObjs[i],[`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im${i} ${imgObjs[i]} 0 R >> >> /Contents ${contentObjs[i]} 0 R >>`]);
+   obj(imgObjs[i],[`<< /Type /XObject /Subtype /Image /Width ${w} /Height ${h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${images[i].length} >>\nstream\n`,images[i],'\nendstream']);
+   const content=enc.encode(`q\n595.28 0 0 841.89 0 0 cm\n/Im${i} Do\nQ\n`);
+   obj(contentObjs[i],[`<< /Length ${content.length} >>\nstream\n`,content,'endstream']);
+ }
+
+ const size=next;
+ const xref=len;
+ push(`xref\n0 ${size}\n0000000000 65535 f \n`);
+ for(let i=1;i<size;i++)push(String(offs[i]).padStart(10,'0')+' 00000 n \n');
+ push(`trailer\n<< /Size ${size} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
  return new Blob(chunks,{type:'application/pdf'});
 }
 async function downloadPDF(){
@@ -413,9 +430,78 @@ async function downloadPDF(){
  g.textAlign='left';g.font='18px "Microsoft JhengHei","Noto Sans TC",sans-serif';g.fillStyle='#666';
  g.fillText('本文件由申請人自行填寫並以電子簽名確認。',55,1705);
 
+
+ // ===== PDF Page 2: Payroll Deduction Authorization =====
+ const c2=document.createElement('canvas');c2.width=1240;c2.height=1754;const g2=c2.getContext('2d');
+ g2.fillStyle='#fff';g2.fillRect(0,0,c2.width,c2.height);
+
+ g2.textAlign='center';g2.fillStyle='#111';
+ g2.font='bold 50px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+ g2.fillText('台灣美光晶圓科技企業工會',620,90);
+ g2.fillStyle='#0b668f';g2.font='bold 32px Arial,sans-serif';
+ g2.fillText('MTTW Micron Union',620,140);
+ g2.fillStyle='#111';g2.font='bold 34px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+ g2.fillText('經常會費薪資代扣同意書',620,205);
+ g2.font='bold 24px Arial,sans-serif';g2.fillStyle='#333';
+ g2.fillText('Authorization for Payroll Deduction of Monthly Union Dues',620,245);
+ g2.strokeStyle='#0b668f';g2.lineWidth=5;drawLine(g2,70,275,1170,275,5);
+
+ g2.textAlign='left';g2.fillStyle='#111';
+ g2.font='24px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+ const authZh='本人為台灣美光晶圓科技股份有限公司企業工會會員，同意依工會法第 28 條第 3 項規定，自本人提出申請後，於應繳經常會費當月，由台灣美光晶圓科技股份有限公司自本人每月薪資中代扣工會每月經常會費新臺幣 200 元，並將扣取之會費轉交工會。如本人當月薪資不足扣款，則依工會其他繳費方式辦理。';
+ let y2=335;
+ wrap(g2,authZh,1080).forEach((t,i)=>g2.fillText(t,80,y2+i*40));
+ y2+=wrap(g2,authZh,1080).length*40+30;
+
+ const authZh2='如本人欲改以其他方式繳納經常會費，將自行向工會提出取消薪資代扣會費之申請，再由公司停止自本人薪資中扣取工會經常會費。';
+ wrap(g2,authZh2,1080).forEach((t,i)=>g2.fillText(t,80,y2+i*40));
+ y2+=wrap(g2,authZh2,1080).length*40+55;
+
+ g2.fillStyle='#075b82';g2.font='bold 25px Arial,sans-serif';
+ g2.fillText('English',80,y2);
+ y2+=42;
+ g2.fillStyle='#333';g2.font='19px Arial,sans-serif';
+
+ const authEn='I am a member of the Taiwan Micron Technology, Inc. Enterprise Union. In accordance with Article 28, Paragraph 3 of the Labor Union Act, I authorize Taiwan Micron Technology, Inc., after this application is submitted, to deduct the monthly Union dues of NT$200 from my salary in the month in which the dues are payable and remit the deducted dues to the Union. If my salary for a given month is insufficient for the deduction, I will pay the dues using another payment method provided by the Union.';
+ let words2=authEn.split(' '),line2='',lines2=[];
+ for(const word of words2){const t=line2?line2+' '+word:word;if(g2.measureText(t).width>1080&&line2){lines2.push(line2);line2=word}else line2=t}
+ if(line2)lines2.push(line2);
+ lines2.forEach((t,i)=>g2.fillText(t,80,y2+i*29));
+ y2+=lines2.length*29+35;
+
+ const authEn2='If I wish to change to another method of paying the monthly Union dues, I will submit a request to the Union to cancel the payroll deduction authorization, after which the Company will stop deducting the monthly Union dues from my salary.';
+ words2=authEn2.split(' ');line2='';lines2=[];
+ for(const word of words2){const t=line2?line2+' '+word:word;if(g2.measureText(t).width>1080&&line2){lines2.push(line2);line2=word}else line2=t}
+ if(line2)lines2.push(line2);
+ lines2.forEach((t,i)=>g2.fillText(t,80,y2+i*29));
+ y2+=lines2.length*29+55;
+
+ g2.fillStyle='#fff7dc';g2.strokeStyle='#d8bf6c';g2.lineWidth=2;
+ g2.fillRect(70,y2,1100,105);g2.strokeRect(70,y2,1100,105);
+ g2.fillStyle='#8b6500';g2.font='bold 23px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+ g2.fillText('☑ 我已閱讀並同意上述經常會費薪資代扣授權內容。',92,y2+40);
+ g2.font='18px Arial,sans-serif';
+ g2.fillText('I have read and agree to the payroll deduction authorization stated above.',92,y2+73);
+ y2+=145;
+
+ box(g2,70,y2,470,220,'申請日期（西元）','Application Date (Gregorian)',`${v('applyY')} 年 ${v('applyM')} 月 ${v('applyD')} 日`);
+ g2.strokeStyle='#222';g2.lineWidth=2.2;g2.strokeRect(570,y2,600,220);
+ g2.textAlign='left';g2.fillStyle='#111';
+ g2.font='bold 24px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+ g2.fillText('申請人電子簽名',588,y2+32);
+ g2.font='17px Arial,sans-serif';g2.fillStyle='#4f5961';
+ g2.fillText('Applicant Signature',588,y2+56);
+ g2.drawImage(im,600,y2+68,540,110);
+ g2.textAlign='center';g2.font='18px Arial,sans-serif';g2.fillStyle='#555';
+ g2.fillText('Signature / Seal',870,y2+205);
+
+ g2.textAlign='left';g2.font='17px "Microsoft JhengHei","Noto Sans TC",sans-serif';g2.fillStyle='#666';
+ g2.fillText('本同意書與入會申請書一併由申請人以電子簽名確認。',70,1695);
  const data=c.toDataURL('image/jpeg',0.97),bin=atob(data.split(',')[1]),bytes=new Uint8Array(bin.length);
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
- const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
+ const data2=c2.toDataURL('image/jpeg',0.97),bin2=atob(data2.split(',')[1]),bytes2=new Uint8Array(bin2.length);
+ for(let i=0;i<bin2.length;i++)bytes2[i]=bin2.charCodeAt(i);
+ const blob=jpegPdfPages([bytes,bytes2],c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
  a.download=`MTTW_入會申請_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
