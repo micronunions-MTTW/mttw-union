@@ -148,17 +148,7 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
     </div>
 
 
-<div class="feeinfo">
-  <h3>工會會費收取方式 / Union Fee Collection</h3>
-  <div class="feeitem">
-    <strong>入會費：新臺幣 500 元</strong>（只會在入會時收取一次）
-    <span class="en"><strong>Registration Fee: NT$500</strong> (charged once only upon joining the Union)</span>
-  </div>
-  <div class="feeitem">
-    <strong>每月經常會費：新臺幣 200 元</strong>（勾選同意薪資代扣授權後，由公司每月從薪資中代扣並轉交工會）
-    <span class="en"><strong>Monthly Union Dues: NT$200</strong> (after payroll deduction is authorized, the Company will deduct the fee from the member's monthly salary and remit it to the Union)</span>
-  </div>
-</div>
+
 
 <div class="signrow">
   <div class="field"><label class="req">申請日期（西元）<small>Application Date (Gregorian)</small></label><div class="date3"><input id="applyY"><input id="applyM"><input id="applyD"></div></div>
@@ -438,7 +428,7 @@ async function downloadPDF(){
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v30_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v31_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
