@@ -403,27 +403,12 @@ async function downloadPDF(){
 
  sy+=consentH+16;
 
- // Bilingual fee info
- const feeH=180;
- g.fillStyle='#eef8fc';g.strokeStyle='#86bfd5';g.lineWidth=2;
- g.fillRect(x,sy,W,feeH);g.strokeRect(x,sy,W,feeH);
+ 
+ // Fee information omitted here to avoid duplication with the authorization content.
 
- g.fillStyle='#075b82';g.font='bold 21px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- g.fillText('入會與會費說明 / Membership & Union Fee Information',x+20,sy+32);
-
- g.fillStyle='#111';g.font='bold 18px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- g.fillText('入會費：新臺幣 500 元，僅於入會時收取一次。',x+20,sy+65);
- g.fillStyle='#4f5961';g.font='14px Arial,sans-serif';
- g.fillText('Registration Fee: NT$500, charged once only upon joining the Union.',x+20,sy+88);
-
- g.fillStyle='#111';g.font='bold 18px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- g.fillText('每月經常會費：新臺幣 200 元，同意薪資代扣後，由公司每月自薪資代扣並轉交工會。',x+20,sy+120);
- g.fillStyle='#4f5961';g.font='13px Arial,sans-serif';
- g.fillText('Monthly Union Dues: NT$200. After authorization, the Company deducts the dues monthly and remits them to the Union.',x+20,sy+145);
-
- sy+=feeH+16;
 
  // Date and signature
+ sy+=18;
  const bottomH=205;
  box(g,x,sy,500,bottomH,'申請日期（西元）','Application Date (Gregorian)',`${v('applyY')} 年 ${v('applyM')} 月 ${v('applyD')} 日`);
  g.strokeStyle='#222';g.lineWidth=2;g.strokeRect(x+530,sy,600,bottomH);
@@ -444,7 +429,9 @@ async function downloadPDF(){
  g.fillText('Signature / Seal',x+830,sy+190);
 
  g.textAlign='left';g.font='15px "Microsoft JhengHei","Noto Sans TC",sans-serif';g.fillStyle='#666';
- g.fillText('本文件由申請人自行填寫並以電子簽名確認。',55,1725);
+ g.fillText('本文件由申請人自行填寫並以電子簽名確認。',55,1665);
+ g.font='14px Arial,sans-serif';g.fillStyle='#777';
+ g.fillText('This document is completed by the applicant and confirmed with an electronic signature.',55,1690);
 
  // Export single-page PDF
  const data=c.toDataURL('image/jpeg',0.97),bin=atob(data.split(',')[1]),bytes=new Uint8Array(bin.length);
