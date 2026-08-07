@@ -1,4 +1,4 @@
-# MTTW Micron Union 電子入會表單 v9
+# MTTW Micron Union 電子入會表單
 
 修正內容：
 - 工會章程 PDF 已直接嵌入 index.html
