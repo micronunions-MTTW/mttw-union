@@ -52,7 +52,11 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(11,1
 .dialog{width:min(760px,100%);background:#fff;border-radius:16px;padding:20px}.dialog h2{margin:0 0 13px}
 canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:10px;background:#fff;touch-action:none}
 .actions{display:flex;justify-content:flex-end;gap:9px;margin-top:14px}
-@media(max-width:700px){.intro-page{width:100%;margin:0;border-radius:0}.intro-hero{padding:30px 17px 25px}.intro-hero h1{font-size:27px}.intro-hero .en{font-size:19px}.intro-body{padding:22px 16px}.card{width:100%;margin:0;border-radius:0}.header h1{font-size:27px}.header .en{font-size:19px}.header .sub{font-size:20px}.form{padding:18px 15px 28px}.grid,.signrow{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar button{flex:1;padding:11px 7px}.toolbar{gap:7px}.signbox{height:135px}}
+@media(max-width:700px){
+.sig-dialog{max-height:92vh;overflow:auto}
+.sig-dialog canvas{min-height:340px;max-height:52vh}
+.sig-actions{position:sticky;bottom:0;background:#fff;padding-top:10px}
+.intro-page{width:100%;margin:0;border-radius:0}.intro-hero{padding:30px 17px 25px}.intro-hero h1{font-size:27px}.intro-hero .en{font-size:19px}.intro-body{padding:22px 16px}.card{width:100%;margin:0;border-radius:0}.header h1{font-size:27px}.header .en{font-size:19px}.header .sub{font-size:20px}.form{padding:18px 15px 28px}.grid,.signrow{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar button{flex:1;padding:11px 7px}.toolbar{gap:7px}.signbox{height:135px}}
 </style>
 </head>
 <body>
@@ -68,6 +72,17 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
     <div class="intro-copy">
       本工會致力於保障會員勞動權益、促進勞資溝通，並改善會員工作條件與福利。<br>
       申請加入前，請先詳閱工會章程及相關入會說明。
+    </div>
+
+    <div class="before-note" style="margin-top:20px">
+      <strong>📱 建議使用方式 / Recommended Device &amp; Browser</strong><br><br>
+      為確保工會章程、入會申請、電子簽名及 PDF 下載功能正常運作，建議使用：<br>
+      • <strong>iPhone：Safari 瀏覽器</strong><br>
+      • <strong>Android：Chrome 瀏覽器</strong><br><br>
+      For the best experience when viewing the Union Constitution, completing the application,
+      signing electronically, and downloading the PDF, please use:<br>
+      • <strong>iPhone: Safari</strong><br>
+      • <strong>Android: Chrome</strong>
     </div>
     <button type="button" class="constitution-link" style="width:100%;cursor:pointer" onclick="openConstitution()">
       📄 閱讀工會章程（另開視窗）
@@ -88,7 +103,7 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
 
 <div class="toolbar" id="formToolbar" style="display:none">
   <button class="primary" onclick="downloadPDF()">下載 PDF</button>
-  <button class="danger" onclick="clearAll()">清除</button>
+  <button class="danger" onclick="clearAll()">清除 / Clear</button>
 </div>
 
 <main class="card" id="formPage" style="display:none">
@@ -147,9 +162,13 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
 </main>
 
 <div class="modal" id="modal"><div class="dialog">
-<h2>請在下方簽名 / Sign below</h2>
+<h2>請在下方簽名 / Please Sign Below</h2>
+      <p style="margin:8px 0 14px;color:#4f5d66;line-height:1.55;font-size:15px">
+        請使用手指或觸控筆完成電子簽名，簽名將自動套用至入會申請書。<br>
+        Please sign using your finger or a stylus. Your signature will be automatically applied to the membership application form.
+      </p>
 <canvas id="sigCanvas"></canvas>
-<div class="actions"><button class="secondary" onclick="closeSign()">取消</button><button class="secondary" onclick="clearSig()">清除</button><button class="primary" onclick="saveSig()">套用簽名</button></div>
+<div class="actions"><button class="secondary" onclick="closeSign()">取消 / Cancel</button><button class="secondary" onclick="clearSig()">清除 / Clear</button><button class="primary" onclick="saveSig()">套用簽名 / Apply Signature</button></div>
 </div></div>
 
 <script>
