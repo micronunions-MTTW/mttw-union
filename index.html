@@ -106,6 +106,9 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
 
     <div class="before-note" style="margin-top:20px">
       <strong>聯繫我們 / Contact Us</strong><br><br>
+      工會秘書：魏小姐<br>
+      <strong>Union Secretary:</strong> Ms. Wei<br><br>
+      電話 / Phone：<a href="tel:0912862820">0912-862-820</a><br><br>
       Email：<a href="mailto:micronunions@gmail.com">micronunions@gmail.com</a>
     </div>
 
@@ -148,14 +151,17 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
 </header>
 
 <section class="form">
-<button type="button" class="secondary back-intro" onclick="backToIntro()">← 返回入會說明</button>
+<button type="button" class="secondary back-intro" onclick="backToIntro()">← 返回入會說明 / Back to Membership Information</button>
 <div class="grid">
   <div class="field"><label class="req">姓名<small>Name</small></label><input id="name"></div>
   <div class="field"><label class="req">性別<small>Gender</small></label><select id="gender"><option value="">請選擇 / Select</option><option>男 / Male</option><option>女 / Female</option><option>其他 / Other</option><option>不透露 / Prefer not to say</option></select></div>
   <div class="field"><label class="req">工號<small>Worker No.</small></label><input id="workerNo"></div>
+  <div class="field"><label class="req">身分證（護照 ID）<small>National ID / Passport ID</small></label><input id="nationalId" autocomplete="off"></div>
   <div class="field"><label class="req">出生年月日（西元）<small>Birthdate (Gregorian)</small></label><div class="date3"><input id="birthY" inputmode="numeric" placeholder="年 / Year"><input id="birthM" inputmode="numeric" placeholder="月 / Month"><input id="birthD" inputmode="numeric" placeholder="日 / Day"></div></div>
   <div class="field"><label class="req">單位／部門<small>Workplace / Department</small></label><input id="department"></div>
   <div class="field"><label class="req">公司 Email<small>Company Email</small></label><input id="companyEmail" type="email" placeholder="name@micron.com"></div>
+  <div class="field"><label class="req">私人 Email<small>Personal Email</small></label><input id="personalEmail" type="email" placeholder="name@example.com"></div>
+  <div class="field"><label class="req">班別<small>Shift</small></label><input id="shift" placeholder="例如：日班 / 夜班"></div>
   <div class="field"><label class="req">Microsoft Teams<small>Microsoft Teams ID</small></label><input id="teams" placeholder="姓名、帳號或 Email"></div>
   <div class="field"><label class="req">手機號碼<small>Personal Phone</small></label><input id="mobile" type="tel"></div>
   <div class="field full"><label class="req">地址<small>Address</small></label><input id="address"></div>
@@ -331,15 +337,42 @@ function closeSign(){$('modal').classList.remove('open')}
 function clearSig(){ctx.clearRect(0,0,sig.width,sig.height);signed=false}
 function saveSig(){if(!signed){alert('請先簽名 / Please sign first');return}const im=$('signImage');im.src=sig.toDataURL('image/png');im.style.display='block';$('signHint').style.display='none';closeSign()}
 function v(id){return $(id).value.trim()}
-function validate(){const req=[['name','姓名'],['gender','性別'],['workerNo','工號'],['birthY','出生年'],['birthM','出生月'],['birthD','出生日'],['department','單位／部門'],['companyEmail','公司 Email'],['teams','Microsoft Teams'],['mobile','手機號碼'],['address','地址'],['applyY','申請年'],['applyM','申請月'],['applyD','申請日']];for(const [id,n] of req){if(!v(id)){alert('請填寫：'+n);$(id).focus();return false}}if(!$('agree').checked){alert('請勾選同意條款');return false}if($('signImage').style.display!=='block'){alert('請完成電子簽名');return false}return true}
+function validate(){const req=[['name','姓名'],['gender','性別'],['workerNo','工號'],['nationalId','身分證（護照 ID）'],['birthY','出生年'],['birthM','出生月'],['birthD','出生日'],['department','單位／部門'],['companyEmail','公司 Email'],['personalEmail','私人 Email'],['shift','班別'],['teams','Microsoft Teams'],['mobile','手機號碼'],['address','地址'],['applyY','申請年'],['applyM','申請月'],['applyD','申請日']];for(const [id,n] of req){if(!v(id)){alert('請填寫：'+n);$(id).focus();return false}}if(!$('agree').checked){alert('請勾選同意條款');return false}if($('signImage').style.display!=='block'){alert('請完成電子簽名');return false}return true}
 function wrap(ctx,text,maxW){const out=[];let line='';for(const ch of text){const t=line+ch;if(ctx.measureText(t).width>maxW&&line){out.push(line);line=ch}else line=t}if(line)out.push(line);return out}
 function drawLine(ctx,x1,y1,x2,y2,w=1){ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
 function box(ctx,x,y,w,h,labelZh,labelEn,value){
  ctx.strokeStyle='#222';ctx.lineWidth=2.2;ctx.strokeRect(x,y,w,h);
- ctx.textAlign='left';ctx.fillStyle='#111';
- ctx.font='bold 25px "Microsoft JhengHei","Noto Sans TC",sans-serif';ctx.fillText(labelZh,x+15,y+31);
- ctx.font='17px Arial,sans-serif';ctx.fillStyle='#4f5961';ctx.fillText(labelEn,x+15,y+54);
- ctx.font='27px "Microsoft JhengHei","Noto Sans TC",sans-serif';ctx.fillStyle='#111';ctx.fillText(value||'',x+15,y+90);
+ ctx.textAlign='left';
+
+ ctx.fillStyle='#111';
+ ctx.font='bold 23px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+ ctx.fillText(labelZh,x+15,y+27);
+
+ ctx.fillStyle='#59646d';
+ ctx.font='15px Arial,sans-serif';
+ ctx.fillText(labelEn,x+15,y+47);
+
+ const text=(value||'').toString();
+ const maxW=w-30;
+ let fontSize=21;
+ ctx.fillStyle='#111';
+ ctx.font=`${fontSize}px "Microsoft JhengHei","Noto Sans TC",Arial,sans-serif`;
+
+ while(fontSize>14 && ctx.measureText(text).width>maxW){
+   fontSize--;
+   ctx.font=`${fontSize}px "Microsoft JhengHei","Noto Sans TC",Arial,sans-serif`;
+ }
+
+ let shown=text;
+ if(ctx.measureText(shown).width>maxW){
+   shown='';
+   for(const ch of text){
+     if(ctx.measureText(shown+ch+'…').width>maxW)break;
+     shown+=ch;
+   }
+   shown+='…';
+ }
+ ctx.fillText(shown,x+15,y+h-14);
 }
 function jpegPdf(jpeg,w,h){
  const enc=new TextEncoder(),chunks=[],offs=[0];let len=0;
@@ -362,7 +395,7 @@ async function downloadPDF(){
  const c=document.createElement('canvas');c.width=1240;c.height=1754;const g=c.getContext('2d');
  g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);
 
- const x=55,W=1130,half=565,H=102;
+ const x=55,W=1130,half=565,H=90;
 
  // Header
  g.textAlign='center';g.fillStyle='#111';
@@ -378,18 +411,26 @@ async function downloadPDF(){
  const y=220;
  box(g,x,y,half,H,'姓名','Name',v('name'));
  box(g,x+half,y,half,H,'性別','Gender',v('gender'));
+
  box(g,x,y+H,half,H,'工號','Worker No.',v('workerNo'));
  box(g,x+half,y+H,half,H,'出生年月日（西元）','Birthdate (Gregorian)',`${v('birthY')} 年 ${v('birthM')} 月 ${v('birthD')} 日`);
- box(g,x,y+H*2,half,H,'單位／部門','Workplace / Department',v('department'));
- box(g,x+half,y+H*2,half,H,'公司 Email','Company Email',v('companyEmail'));
- box(g,x,y+H*3,half,H,'Microsoft Teams','Microsoft Teams ID',v('teams'));
- box(g,x+half,y+H*3,half,H,'手機號碼','Personal Phone',v('mobile'));
- box(g,x,y+H*4,W,H,'地址','Address',v('address'));
 
- let sy=y+H*5+18;
+ box(g,x,y+H*2,half,H,'身分證（護照 ID）','National ID / Passport ID',v('nationalId'));
+ box(g,x+half,y+H*2,half,H,'單位／部門','Workplace / Department',v('department'));
+
+ box(g,x,y+H*3,half,H,'公司 Email','Company Email',v('companyEmail'));
+ box(g,x+half,y+H*3,half,H,'私人 Email','Personal Email',v('personalEmail'));
+
+ box(g,x,y+H*4,half,H,'班別','Shift',v('shift'));
+ box(g,x+half,y+H*4,half,H,'Microsoft Teams','Microsoft Teams ID',v('teams'));
+
+ box(g,x,y+H*5,half,H,'手機號碼','Personal Phone',v('mobile'));
+ box(g,x+half,y+H*5,half,H,'地址','Address',v('address'));
+
+ let sy=y+H*6+18;
 
  // Full authorization block — same meaning/content as webpage
- const consentH=455;
+ const consentH=425;
  g.fillStyle='#fff7dc';g.strokeStyle='#d8bf6c';g.lineWidth=2;
  g.fillRect(x,sy,W,consentH);g.strokeRect(x,sy,W,consentH);
 
@@ -401,8 +442,8 @@ async function downloadPDF(){
  const zh1='本人為台灣美光晶圓科技股份有限公司企業工會會員，同意依工會法第 28 條第 3 項規定，自本人提出申請後，於應繳經常會費當月，由台灣美光晶圓科技股份有限公司自本人每月薪資中代扣工會每月經常會費新臺幣 200 元，並將扣取之會費轉交工會。';
  const zh2='如本人當月薪資不足扣款，則依工會其他繳費方式辦理。如本人欲改以其他方式繳納經常會費，將自行向工會提出取消薪資代扣會費之申請，再由公司停止自本人薪資中扣取工會經常會費。';
  let yy=sy+70;
- let arr=wrap(g,zh1,W-40);arr.forEach((t,i)=>g.fillText(t,x+20,yy+i*27));yy+=arr.length*27+14;
- arr=wrap(g,zh2,W-40);arr.forEach((t,i)=>g.fillText(t,x+20,yy+i*27));yy+=arr.length*27+18;
+ let arr=wrap(g,zh1,W-40);arr.forEach((t,i)=>g.fillText(t,x+20,yy+i*25));yy+=arr.length*25+12;
+ arr=wrap(g,zh2,W-40);arr.forEach((t,i)=>g.fillText(t,x+20,yy+i*25));yy+=arr.length*25+15;
 
  g.fillStyle='#075b82';g.font='bold 18px Arial,sans-serif';g.fillText('English',x+20,yy);yy+=25;
  g.fillStyle='#4f5961';g.font='14px Arial,sans-serif';
@@ -414,8 +455,8 @@ async function downloadPDF(){
      if(g.measureText(t).width>W-40&&line){lines.push(line);line=word}else line=t;
    }
    if(line)lines.push(line);
-   lines.forEach((t,i)=>g.fillText(t,x+20,startY+i*20));
-   return startY+lines.length*20;
+   lines.forEach((t,i)=>g.fillText(t,x+20,startY+i*19));
+   return startY+lines.length*19;
  }
 
  const en1='I am a member of the Taiwan Micron Technology, Inc. Enterprise Union. In accordance with Article 28, Paragraph 3 of the Labor Union Act, I authorize Taiwan Micron Technology, Inc., after this application is submitted, to deduct the monthly Union dues of NT$200 from my salary in the month in which the dues are payable and remit the deducted dues to the Union.';
@@ -460,7 +501,7 @@ async function downloadPDF(){
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v31_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v38_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
