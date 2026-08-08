@@ -58,6 +58,17 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
 .sig-actions{position:sticky;bottom:0;background:#fff;padding-top:10px}
 .intro-page{width:100%;margin:0;border-radius:0}.intro-hero{padding:30px 17px 25px}.intro-hero h1{font-size:27px}.intro-hero .en{font-size:19px}.intro-body{padding:22px 16px}.card{width:100%;margin:0;border-radius:0}.header h1{font-size:27px}.header .en{font-size:19px}.header .sub{font-size:20px}.form{padding:18px 15px 28px}.grid,.signrow{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar button{flex:1;padding:11px 7px}.toolbar{gap:7px}.signbox{height:135px}}
 </style>
+
+<style>
+.bilingual-check small{
+  display:block;
+  margin-top:4px;
+  font-size:.76em;
+  font-weight:600;
+  line-height:1.35;
+  color:#5f6b76;
+}
+</style>
 </head>
 <body>
 
@@ -120,7 +131,7 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
       The Union shall conduct its affairs in accordance with applicable laws and the Union Bylaws, safeguard the lawful labor rights and interests of its members, and promote constructive communication and cooperation between labor and management.
     </div>
     <button type="button" class="constitution-link" style="width:100%;cursor:pointer" onclick="openConstitution()">
-      📄 閱讀工會章程（另開視窗）
+      📄 閱讀工會章程（另開視窗） / Read Union Bylaws (Open in New Window)
     </button>
     <div class="before-note">
       <strong>入會與會費說明 / Membership &amp; Union Fee Information</strong><br><br>
@@ -130,11 +141,11 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
       <strong>Monthly Union Dues:</strong> NT$200. After payroll deduction is authorized, the Company will deduct the dues from the member's monthly salary and remit them to the Union.
     </div>
     <div class="intro-checks">
-      <label><input type="checkbox" class="introConsent">我已閱讀工會章程。</label>
-      <label><input type="checkbox" class="introConsent">我同意遵守工會章程。</label>
-      <label><input type="checkbox" class="introConsent">我同意薪資代扣會費授權。</label>
+      <label class="bilingual-check"><input type="checkbox" class="introConsent">我已閱讀工會章程。<br><small>I have read the Union Bylaws.</small></label>
+      <label class="bilingual-check"><input type="checkbox" class="introConsent">我同意遵守工會章程。<br><small>I agree to comply with the Union Bylaws.</small></label>
+      <label class="bilingual-check"><input type="checkbox" class="introConsent">我同意薪資代扣會費授權。<br><small>I agree to the payroll deduction authorization for Union dues.</small></label>
     </div>
-    <button class="primary next-button" id="nextButton" disabled onclick="enterForm()">下一步：填寫入會申請</button>
+    <button class="primary next-button" id="nextButton" disabled onclick="enterForm()">下一步：填寫入會申請 / Next Step: Complete Membership Application</button>
   </div>
 </section>
 
@@ -501,7 +512,7 @@ async function downloadPDF(){
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v38_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v40_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
