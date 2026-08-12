@@ -69,8 +69,60 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
   color:#5f6b76;
 }
 </style>
+
+
+
+<style>
+body::before,
+body::after{
+  position:fixed;
+  left:50%;
+  width:120%;
+  text-align:center;
+  transform:translateX(-50%) rotate(-28deg);
+  transform-origin:center;
+  font-size:26px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:rgba(60,80,100,0.045);
+  white-space:nowrap;
+  pointer-events:none;
+  z-index:0;
+}
+body::before{
+  content:"僅供台灣美光晶圓企業工會入會使用 / For MTTW Micron Union Membership Use Only";
+  top:34%;
+}
+body::after{
+  content:"僅供台灣美光晶圓企業工會入會使用 / For MTTW Micron Union Membership Use Only";
+  top:66%;
+}
+.watermark-mid{
+  position:fixed;
+  left:50%;
+  top:50%;
+  width:120%;
+  text-align:center;
+  transform:translate(-50%,-50%) rotate(-28deg);
+  transform-origin:center;
+  font-size:26px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:rgba(60,80,100,0.045);
+  white-space:nowrap;
+  pointer-events:none;
+  z-index:0;
+}
+.app, .wrap, .container, main, section, .card, .panel, .page, .box{
+  position:relative;
+  z-index:1;
+}
+</style>
+
+
 </head>
 <body>
+<div class="watermark-mid">僅供台灣美光晶圓企業工會入會使用 / For MTTW Micron Union Membership Use Only</div>
 
 <section class="intro-page" id="introPage">
   <header class="intro-hero">
@@ -150,7 +202,7 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
 </section>
 
 <div class="toolbar" id="formToolbar" style="display:none">
-  <button class="primary" onclick="downloadPDF()">下載 PDF</button>
+  <button class="primary" onclick="downloadPDF()">儲存 PDF / Save PDF</button>
   <button class="danger" onclick="clearAll()">清除 / Clear</button>
 </div>
 
@@ -400,11 +452,30 @@ function jpegPdf(jpeg,w,h){
  push(`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`);
  return new Blob(chunks,{type:'application/pdf'});
 }
+function drawPdfWatermark(ctx,w,h){
+ ctx.save();
+ ctx.translate(w/2,h/2);
+ ctx.rotate(-Math.PI/6.8);
+ ctx.textAlign='center';
+ ctx.fillStyle='rgba(60,80,100,0.045)';
+ ctx.font='bold 27px "Microsoft JhengHei","Noto Sans TC",Arial,sans-serif';
+ const wm='僅供台灣美光晶圓企業工會入會使用 / For MTTW Micron Union Membership Use Only';
+ ctx.fillText(wm,0,-230);
+ ctx.fillText(wm,0,0);
+ ctx.fillText(wm,0,230);
+ ctx.restore();
+}
+
 async function downloadPDF(){
- if(!validate())return;
+ if(!$('agree').checked){
+   alert('請先勾選「經常會費薪資代扣同意 / Authorization for Payroll Deduction of Monthly Union Dues」');
+   $('agree').focus();
+   return;
+ }
 
  const c=document.createElement('canvas');c.width=1240;c.height=1754;const g=c.getContext('2d');
  g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);
+ drawPdfWatermark(g,c.width,c.height);
 
  const x=55,W=1130,half=565,H=90;
 
@@ -512,7 +583,7 @@ async function downloadPDF(){
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v40_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v46_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
