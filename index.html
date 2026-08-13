@@ -636,7 +636,7 @@ async function downloadPDF(){
  g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);
  drawPdfWatermark(g,c.width,c.height);
 
- const x=55,W=1130,half=565,H=90;
+ const x=55,W=1130,half=565,H=100;
 
  // Header
  g.textAlign='center';g.fillStyle='#111';
@@ -712,8 +712,8 @@ async function downloadPDF(){
 
 
  // Date and signature
- sy+=120;
- const bottomH=205;
+ sy+=60;
+ const bottomH=220;
  // Application date box — larger and centered
  g.strokeStyle='#222';g.lineWidth=2.2;g.strokeRect(x,sy,500,bottomH);
  g.textAlign='left';
@@ -729,7 +729,7 @@ async function downloadPDF(){
  g.textBaseline='middle';
  g.fillStyle='#111';
  g.font='bold 34px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- g.fillText(`${v('applyY')} 年 ${v('applyM')} 月 ${v('applyD')} 日`,x+250,sy+128);
+ g.fillText(`${v('applyY')} 年 ${v('applyM')} 月 ${v('applyD')} 日`,x+250,sy+138);
  g.restore();
 
  g.strokeStyle='#222';g.lineWidth=2;g.strokeRect(x+530,sy,600,bottomH);
@@ -745,21 +745,21 @@ async function downloadPDF(){
    });
  }
  if(im.decode){await im.decode().catch(()=>{});}
- drawSignaturePreserve(g,im,x+565,sy+58,525,115);
+ drawSignaturePreserve(g,im,x+565,sy+58,525,130);
  g.textAlign='center';g.font='16px Arial,sans-serif';g.fillStyle='#555';
- g.fillText('Signature / Seal',x+830,sy+190);
+ g.fillText('Signature / Seal',x+830,sy+202);
 
  g.textAlign='left';g.font='15px "Microsoft JhengHei","Noto Sans TC",sans-serif';g.fillStyle='#666';
- g.fillText('本文件由申請人自行填寫並以電子簽名確認。',55,1712);
+ g.fillText('本文件由申請人自行填寫並以電子簽名確認。',55,1716);
  g.font='14px Arial,sans-serif';g.fillStyle='#777';
- g.fillText('This document is completed by the applicant and confirmed with an electronic signature.',55,1736);
+ g.fillText('This document is completed by the applicant and confirmed with an electronic signature.',55,1740);
 
  // Export single-page PDF
  const data=c.toDataURL('image/jpeg',0.97),bin=atob(data.split(',')[1]),bytes=new Uint8Array(bin.length);
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v51_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v52_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
