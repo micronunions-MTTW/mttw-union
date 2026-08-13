@@ -602,7 +602,24 @@ async function downloadPDF(){
  // Date and signature
  sy+=18;
  const bottomH=205;
- box(g,x,sy,500,bottomH,'申請日期（西元）','Application Date (Gregorian)',`${v('applyY')} 年 ${v('applyM')} 月 ${v('applyD')} 日`);
+ // Application date box — larger and centered
+ g.strokeStyle='#222';g.lineWidth=2.2;g.strokeRect(x,sy,500,bottomH);
+ g.textAlign='left';
+ g.fillStyle='#111';
+ g.font='bold 23px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+ g.fillText('申請日期（西元）',x+15,sy+27);
+ g.fillStyle='#59646d';
+ g.font='15px Arial,sans-serif';
+ g.fillText('Application Date (Gregorian)',x+15,sy+47);
+
+ g.save();
+ g.textAlign='center';
+ g.textBaseline='middle';
+ g.fillStyle='#111';
+ g.font='bold 34px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+ g.fillText(`${v('applyY')} 年 ${v('applyM')} 月 ${v('applyD')} 日`,x+250,sy+128);
+ g.restore();
+
  g.strokeStyle='#222';g.lineWidth=2;g.strokeRect(x+530,sy,600,bottomH);
  g.fillStyle='#111';g.font='bold 22px "Microsoft JhengHei","Noto Sans TC",sans-serif';g.textAlign='left';
  g.fillText('申請人電子簽名',x+548,sy+30);
@@ -630,7 +647,7 @@ async function downloadPDF(){
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v47_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v48_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
