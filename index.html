@@ -768,8 +768,14 @@ async function downloadPDF(){
  g.fillRect(x,sy,W,consentH);g.strokeRect(x,sy,W,consentH);
 
  g.textAlign='left';g.fillStyle='#8b6500';
- g.font='bold 28px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- g.fillText('☑ 經常會費薪資代扣同意 / Authorization for Payroll Deduction of Monthly Union Dues',x+20,sy+40);
+ const consentTitle='☑ 經常會費薪資代扣同意 / Authorization for Payroll Deduction of Monthly Union Dues';
+ let consentTitleSize=28;
+ g.font=`bold ${consentTitleSize}px "Microsoft JhengHei","Noto Sans TC",sans-serif`;
+ while(g.measureText(consentTitle).width>W-40 && consentTitleSize>21){
+   consentTitleSize-=1;
+   g.font=`bold ${consentTitleSize}px "Microsoft JhengHei","Noto Sans TC",sans-serif`;
+ }
+ g.fillText(consentTitle,x+20,sy+40);
 
  g.fillStyle='#111';g.font='22px "Microsoft JhengHei","Noto Sans TC",sans-serif';
  const zh1='本人為台灣美光晶圓科技股份有限公司企業工會會員，同意依工會法第 28 條第 3 項規定，自本人提出申請後，於應繳經常會費當月，由台灣美光晶圓科技股份有限公司自本人每月薪資中代扣工會每月經常會費新臺幣 200 元，並將扣取之會費轉交工會。';
@@ -842,7 +848,7 @@ async function downloadPDF(){
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v60_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v61_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
