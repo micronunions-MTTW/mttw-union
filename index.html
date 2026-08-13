@@ -466,6 +466,53 @@ function drawPdfWatermark(ctx,w,h){
  ctx.restore();
 }
 
+
+function drawSignaturePreserve(ctx,img,x,y,w,h){
+  if(!img || !img.naturalWidth || !img.naturalHeight) return;
+
+  // Draw the signature image to a temporary canvas so transparent margins
+  // around the actual handwriting can be detected and cropped.
+  const tmp=document.createElement('canvas');
+  tmp.width=img.naturalWidth;
+  tmp.height=img.naturalHeight;
+  const tg=tmp.getContext('2d');
+  tg.drawImage(img,0,0);
+
+  let sx=0,sy=0,sw=tmp.width,sh=tmp.height;
+  try{
+    const data=tg.getImageData(0,0,tmp.width,tmp.height).data;
+    let minX=tmp.width,minY=tmp.height,maxX=-1,maxY=-1;
+    for(let yy=0;yy<tmp.height;yy++){
+      for(let xx=0;xx<tmp.width;xx++){
+        const a=data[(yy*tmp.width+xx)*4+3];
+        if(a>12){
+          if(xx<minX)minX=xx;
+          if(xx>maxX)maxX=xx;
+          if(yy<minY)minY=yy;
+          if(yy>maxY)maxY=yy;
+        }
+      }
+    }
+    if(maxX>=minX && maxY>=minY){
+      const pad=Math.max(8,Math.round(Math.min(tmp.width,tmp.height)*0.025));
+      sx=Math.max(0,minX-pad);
+      sy=Math.max(0,minY-pad);
+      const ex=Math.min(tmp.width,maxX+pad+1);
+      const ey=Math.min(tmp.height,maxY+pad+1);
+      sw=ex-sx;
+      sh=ey-sy;
+    }
+  }catch(e){}
+
+  // Contain inside the PDF signature area without stretching.
+  const scale=Math.min(w/sw,h/sh);
+  const dw=sw*scale;
+  const dh=sh*scale;
+  const dx=x+(w-dw)/2;
+  const dy=y+(h-dh)/2;
+  ctx.drawImage(img,sx,sy,sw,sh,dx,dy,dw,dh);
+}
+
 async function downloadPDF(){
  if(!$('agree').checked){
    alert('請先勾選「經常會費薪資代扣同意 / Authorization for Payroll Deduction of Monthly Union Dues」');
@@ -569,7 +616,7 @@ async function downloadPDF(){
    });
  }
  if(im.decode){await im.decode().catch(()=>{});}
- g.drawImage(im,x+565,sy+60,525,100);
+ drawSignaturePreserve(g,im,x+565,sy+58,525,115);
  g.textAlign='center';g.font='16px Arial,sans-serif';g.fillStyle='#555';
  g.fillText('Signature / Seal',x+830,sy+190);
 
@@ -583,7 +630,7 @@ async function downloadPDF(){
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v46_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v47_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
