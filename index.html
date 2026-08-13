@@ -49,8 +49,8 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(11,1
 .signpreview-label .en{font-weight:800}
 .signpreview .signbox{
   width:100%;
-  max-width:320px;
-  height:92px;
+  max-width:360px;
+  height:116px;
   padding:8px 12px;
   border:2px dashed #969fa6;
   border-radius:10px;
@@ -67,8 +67,8 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(11,1
   display:none;
   width:auto;
   height:auto;
-  max-width:92%;
-  max-height:84%;
+  max-width:96%;
+  max-height:90%;
   object-fit:contain;
 }
 .signpreview .caption{
@@ -87,7 +87,7 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
 .sig-dialog{max-height:92vh;overflow:auto}
 .sig-dialog canvas{min-height:340px;max-height:52vh}
 .sig-actions{position:sticky;bottom:0;background:#fff;padding-top:10px}
-.intro-page{width:100%;margin:0;border-radius:0}.intro-hero{padding:30px 17px 25px}.intro-hero h1{font-size:27px}.intro-hero .en{font-size:19px}.intro-body{padding:22px 16px}.card{width:100%;margin:0;border-radius:0}.header h1{font-size:27px}.header .en{font-size:19px}.header .sub{font-size:20px}.form{padding:18px 15px 28px}.grid,.signrow{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar button{flex:1;padding:11px 7px}.toolbar{gap:7px}.signpreview{align-items:flex-start}.signpreview .signbox{width:min(320px,88%);height:92px}.signpreview .signbox img{max-width:92%;max-height:84%}}
+.intro-page{width:100%;margin:0;border-radius:0}.intro-hero{padding:30px 17px 25px}.intro-hero h1{font-size:27px}.intro-hero .en{font-size:19px}.intro-body{padding:22px 16px}.card{width:100%;margin:0;border-radius:0}.header h1{font-size:27px}.header .en{font-size:19px}.header .sub{font-size:20px}.form{padding:18px 15px 28px}.grid,.signrow{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar button{flex:1;padding:11px 7px}.toolbar{gap:7px}.signpreview{align-items:flex-start}.signpreview .signbox{width:min(360px,94%);height:116px}.signpreview .signbox img{max-width:96%;max-height:90%}}
 </style>
 
 <style>
@@ -796,15 +796,9 @@ async function downloadPDF(){
 
  g.strokeStyle='#222';g.lineWidth=2;g.strokeRect(x+530,sy,600,bottomH);
  g.fillStyle='#111';g.font='bold 22px "Microsoft JhengHei","Noto Sans TC",sans-serif';g.textAlign='left';
- g.fillText('申請人 / Applicant',x+548,sy+30);
-
- const signInnerX=x+625, signInnerY=sy+52, signInnerW=300, signInnerH=92;
- g.save();
- g.setLineDash([10,10]);
- g.strokeStyle='#9aa3ab';
- g.lineWidth=2;
- g.strokeRect(signInnerX,signInnerY,signInnerW,signInnerH);
- g.restore();
+ g.fillText('申請人電子簽名',x+548,sy+30);
+ g.font='15px Arial,sans-serif';g.fillStyle='#4f5961';
+ g.fillText('Applicant Signature',x+548,sy+52);
 
  const im=$('signImage');
  if(!im.complete){
@@ -814,9 +808,9 @@ async function downloadPDF(){
    });
  }
  if(im.decode){await im.decode().catch(()=>{});}
- drawSignaturePreserve(g,im,signInnerX+10,signInnerY+8,signInnerW-20,signInnerH-18);
+ drawSignaturePreserve(g,im,x+555,sy+60,550,132);
  g.textAlign='center';g.font='16px Arial,sans-serif';g.fillStyle='#555';
- g.fillText('（簽章 / Signature / Seal）',signInnerX+signInnerW/2,sy+172);
+ g.fillText('Signature / Seal',x+830,sy+205);
 
  g.textAlign='left';g.font='15px "Microsoft JhengHei","Noto Sans TC",sans-serif';g.fillStyle='#666';
  g.fillText('本文件由申請人自行填寫並以電子簽名確認。',55,1716);
@@ -828,7 +822,7 @@ async function downloadPDF(){
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v55_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v56_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
