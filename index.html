@@ -49,9 +49,9 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(11,1
 .signpreview-label .en{font-weight:800}
 .signpreview .signbox{
   width:100%;
-  max-width:360px;
-  height:108px;
-  padding:10px 16px;
+  max-width:320px;
+  height:92px;
+  padding:8px 12px;
   border:2px dashed #969fa6;
   border-radius:10px;
   display:flex;
@@ -67,8 +67,8 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(11,1
   display:none;
   width:auto;
   height:auto;
-  max-width:82%;
-  max-height:76%;
+  max-width:92%;
+  max-height:84%;
   object-fit:contain;
 }
 .signpreview .caption{
@@ -87,7 +87,7 @@ canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:
 .sig-dialog{max-height:92vh;overflow:auto}
 .sig-dialog canvas{min-height:340px;max-height:52vh}
 .sig-actions{position:sticky;bottom:0;background:#fff;padding-top:10px}
-.intro-page{width:100%;margin:0;border-radius:0}.intro-hero{padding:30px 17px 25px}.intro-hero h1{font-size:27px}.intro-hero .en{font-size:19px}.intro-body{padding:22px 16px}.card{width:100%;margin:0;border-radius:0}.header h1{font-size:27px}.header .en{font-size:19px}.header .sub{font-size:20px}.form{padding:18px 15px 28px}.grid,.signrow{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar button{flex:1;padding:11px 7px}.toolbar{gap:7px}.signpreview{align-items:flex-start}.signpreview .signbox{width:min(360px,92%);height:108px}.signpreview .signbox img{max-width:80%;max-height:72%}}
+.intro-page{width:100%;margin:0;border-radius:0}.intro-hero{padding:30px 17px 25px}.intro-hero h1{font-size:27px}.intro-hero .en{font-size:19px}.intro-body{padding:22px 16px}.card{width:100%;margin:0;border-radius:0}.header h1{font-size:27px}.header .en{font-size:19px}.header .sub{font-size:20px}.form{padding:18px 15px 28px}.grid,.signrow{grid-template-columns:1fr}.field.full{grid-column:auto}.toolbar button{flex:1;padding:11px 7px}.toolbar{gap:7px}.signpreview{align-items:flex-start}.signpreview .signbox{width:min(320px,88%);height:92px}.signpreview .signbox img{max-width:92%;max-height:84%}}
 </style>
 
 <style>
@@ -541,7 +541,38 @@ function closeSign(){
   window.scrollTo(0,sy);
 }
 function clearSig(){ctx.clearRect(0,0,sig.width,sig.height);signed=false}
-function saveSig(){if(!signed){alert('請先簽名 / Please sign first');return}const im=$('signImage');im.src=sig.toDataURL('image/png');im.style.display='block';$('signHint').style.display='none';closeSign()}
+function trimmedSignatureDataURL(srcCanvas){
+  const w=srcCanvas.width,h=srcCanvas.height;
+  const ctx=srcCanvas.getContext('2d');
+  const data=ctx.getImageData(0,0,w,h).data;
+  let minX=w,minY=h,maxX=-1,maxY=-1;
+  for(let y=0;y<h;y++){
+    for(let x=0;x<w;x++){
+      const a=data[(y*w+x)*4+3];
+      if(a>12){
+        if(x<minX)minX=x; if(x>maxX)maxX=x;
+        if(y<minY)minY=y; if(y>maxY)maxY=y;
+      }
+    }
+  }
+  if(maxX<minX || maxY<minY) return srcCanvas.toDataURL('image/png');
+  const pad=8;
+  minX=Math.max(0,minX-pad); minY=Math.max(0,minY-pad);
+  maxX=Math.min(w-1,maxX+pad); maxY=Math.min(h-1,maxY+pad);
+  const cw=maxX-minX+1, ch=maxY-minY+1;
+  const out=document.createElement('canvas');
+  out.width=cw; out.height=ch;
+  out.getContext('2d').drawImage(srcCanvas,minX,minY,cw,ch,0,0,cw,ch);
+  return out.toDataURL('image/png');
+}
+function saveSig(){
+  if(!signed){alert('請先簽名 / Please sign first');return}
+  const im=$('signImage');
+  im.src=trimmedSignatureDataURL(sig);
+  im.style.display='block';
+  $('signHint').style.display='none';
+  closeSign();
+}
 function v(id){return $(id).value.trim()}
 function validate(){const req=[['name','姓名'],['gender','性別'],['workerNo','工號'],['nationalId','身分證（護照 ID）'],['birthY','出生年'],['birthM','出生月'],['birthD','出生日'],['department','單位／部門'],['companyEmail','公司 Email'],['personalEmail','私人 Email'],['shift','班別'],['teams','Microsoft Teams'],['mobile','手機號碼'],['address','地址'],['applyY','申請年'],['applyM','申請月'],['applyD','申請日']];for(const [id,n] of req){if(!v(id)){alert('請填寫：'+n);$(id).focus();return false}}if(!$('agree').checked){alert('請勾選同意條款');return false}if($('signImage').style.display!=='block'){alert('請完成電子簽名');return false}return true}
 function wrap(ctx,text,maxW){const out=[];let line='';for(const ch of text){const t=line+ch;if(ctx.measureText(t).width>maxW&&line){out.push(line);line=ch}else line=t}if(line)out.push(line);return out}
@@ -765,8 +796,15 @@ async function downloadPDF(){
 
  g.strokeStyle='#222';g.lineWidth=2;g.strokeRect(x+530,sy,600,bottomH);
  g.fillStyle='#111';g.font='bold 22px "Microsoft JhengHei","Noto Sans TC",sans-serif';g.textAlign='left';
- g.fillText('申請人電子簽名',x+548,sy+30);
- g.font='15px Arial,sans-serif';g.fillStyle='#4f5961';g.fillText('Applicant Signature',x+548,sy+52);
+ g.fillText('申請人 / Applicant',x+548,sy+30);
+
+ const signInnerX=x+625, signInnerY=sy+52, signInnerW=300, signInnerH=92;
+ g.save();
+ g.setLineDash([10,10]);
+ g.strokeStyle='#9aa3ab';
+ g.lineWidth=2;
+ g.strokeRect(signInnerX,signInnerY,signInnerW,signInnerH);
+ g.restore();
 
  const im=$('signImage');
  if(!im.complete){
@@ -776,9 +814,9 @@ async function downloadPDF(){
    });
  }
  if(im.decode){await im.decode().catch(()=>{});}
- drawSignaturePreserve(g,im,x+565,sy+58,525,130);
+ drawSignaturePreserve(g,im,signInnerX+10,signInnerY+8,signInnerW-20,signInnerH-18);
  g.textAlign='center';g.font='16px Arial,sans-serif';g.fillStyle='#555';
- g.fillText('Signature / Seal',x+830,sy+202);
+ g.fillText('（簽章 / Signature / Seal）',signInnerX+signInnerW/2,sy+172);
 
  g.textAlign='left';g.font='15px "Microsoft JhengHei","Noto Sans TC",sans-serif';g.fillStyle='#666';
  g.fillText('本文件由申請人自行填寫並以電子簽名確認。',55,1716);
@@ -790,7 +828,7 @@ async function downloadPDF(){
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v54_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v55_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
