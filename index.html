@@ -712,7 +712,7 @@ async function downloadPDF(){
 
 
  // Date and signature
- sy+=18;
+ sy+=120;
  const bottomH=205;
  // Application date box — larger and centered
  g.strokeStyle='#222';g.lineWidth=2.2;g.strokeRect(x,sy,500,bottomH);
@@ -750,16 +750,16 @@ async function downloadPDF(){
  g.fillText('Signature / Seal',x+830,sy+190);
 
  g.textAlign='left';g.font='15px "Microsoft JhengHei","Noto Sans TC",sans-serif';g.fillStyle='#666';
- g.fillText('本文件由申請人自行填寫並以電子簽名確認。',55,1665);
+ g.fillText('本文件由申請人自行填寫並以電子簽名確認。',55,1712);
  g.font='14px Arial,sans-serif';g.fillStyle='#777';
- g.fillText('This document is completed by the applicant and confirmed with an electronic signature.',55,1690);
+ g.fillText('This document is completed by the applicant and confirmed with an electronic signature.',55,1736);
 
  // Export single-page PDF
  const data=c.toDataURL('image/jpeg',0.97),bin=atob(data.split(',')[1]),bytes=new Uint8Array(bin.length);
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v50_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v51_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
