@@ -120,6 +120,94 @@ body::after{
 </style>
 
 
+
+<style>
+/* v50 full-screen signature */
+#modal.modal{
+  position:fixed !important;
+  inset:0 !important;
+  width:100vw !important;
+  height:100dvh !important;
+  display:none !important;
+  align-items:stretch !important;
+  justify-content:stretch !important;
+  margin:0 !important;
+  padding:0 !important;
+  background:#fff !important;
+  z-index:2147483647 !important;
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+}
+#modal.modal.open{display:flex !important;}
+#modal .signature-dialog-clean{
+  width:100vw !important;
+  height:100dvh !important;
+  max-width:none !important;
+  max-height:none !important;
+  margin:0 !important;
+  padding:10px !important;
+  border-radius:0 !important;
+  background:#fff !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:10px !important;
+  overflow:hidden !important;
+}
+#sigCanvas{
+  width:100% !important;
+  flex:1 1 0 !important;
+  min-height:0 !important;
+  height:auto !important;
+  display:block !important;
+  margin:0 !important;
+  border:2px solid #c8d1d7 !important;
+  border-radius:14px !important;
+  background:#fff !important;
+  box-sizing:border-box !important;
+  touch-action:none !important;
+  overscroll-behavior:none !important;
+  user-select:none !important;
+  -webkit-user-select:none !important;
+  -webkit-touch-callout:none !important;
+}
+#modal .signature-actions-clean{
+  display:grid !important;
+  grid-template-columns:1fr 1fr 1.45fr !important;
+  gap:8px !important;
+  flex:0 0 auto !important;
+  margin:0 !important;
+  padding:0 0 env(safe-area-inset-bottom, 0px) 0 !important;
+  background:#fff !important;
+}
+#modal .signature-actions-clean button{
+  min-height:72px !important;
+  margin:0 !important;
+  padding:8px 6px !important;
+  border-radius:14px !important;
+  font-size:18px !important;
+  font-weight:800 !important;
+  line-height:1.15 !important;
+  touch-action:manipulation !important;
+}
+html.signature-open,
+body.signature-open{
+  width:100% !important;
+  height:100% !important;
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+}
+body.signature-open{
+  position:fixed !important;
+  left:0 !important;
+  right:0 !important;
+}
+@media (orientation:landscape){
+  #modal .signature-dialog-clean{padding:8px !important;gap:8px !important;}
+  #modal .signature-actions-clean button{min-height:56px !important;font-size:16px !important;}
+}
+</style>
+
 </head>
 <body>
 <div class="watermark-mid">僅供台灣美光晶圓企業工會入會使用 / For MTTW Micron Union Membership Use Only</div>
@@ -264,15 +352,16 @@ body::after{
 </section>
 </main>
 
-<div class="modal" id="modal"><div class="dialog">
-<h2>請在下方簽名 / Please Sign Below</h2>
-      <p style="margin:8px 0 14px;color:#4f5d66;line-height:1.55;font-size:15px">
-        請使用手指或觸控筆完成電子簽名，簽名將自動套用至入會申請書。<br>
-        Please sign using your finger or a stylus. Your signature will be automatically applied to the membership application form.
-      </p>
-<canvas id="sigCanvas"></canvas>
-<div class="actions"><button class="secondary" onclick="closeSign()">取消 / Cancel</button><button class="secondary" onclick="clearSig()">清除 / Clear</button><button class="primary" onclick="saveSig()">套用簽名 / Apply Signature</button></div>
-</div></div>
+<div class="modal" id="modal">
+  <div class="dialog signature-dialog-clean">
+    <canvas id="sigCanvas"></canvas>
+    <div class="actions signature-actions-clean">
+      <button class="secondary" onclick="closeSign()">取消 / Cancel</button>
+      <button class="secondary" onclick="clearSig()">清除 / Clear</button>
+      <button class="primary" onclick="saveSig()">套用簽名 / Apply Signature</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const $=id=>document.getElementById(id);
@@ -388,15 +477,38 @@ let drawing=false,signed=false;
 function today(){const d=new Date();$('applyY').value=d.getFullYear();$('applyM').value=d.getMonth()+1;$('applyD').value=d.getDate()}today();
 function sizeSig(){const r=sig.getBoundingClientRect(),dpr=Math.max(devicePixelRatio||1,1);sig.width=Math.round(r.width*dpr);sig.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#111'}
 function p(e){const r=sig.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
-function down(e){drawing=true;const q=p(e);ctx.beginPath();ctx.moveTo(q.x,q.y);e.preventDefault()}
-function move(e){if(!drawing)return;const q=p(e);ctx.lineTo(q.x,q.y);ctx.stroke();signed=true;e.preventDefault()}
-function up(e){drawing=false;if(e)e.preventDefault()}
+function down(e){if(e.cancelable)e.preventDefault();drawing=true;const q=p(e);ctx.beginPath();ctx.moveTo(q.x,q.y);}
+function move(e){if(e.cancelable)e.preventDefault();if(!drawing)return;const q=p(e);ctx.lineTo(q.x,q.y);ctx.stroke();signed=true;}
+function up(e){if(e&&e.cancelable)e.preventDefault();drawing=false;}
 sig.addEventListener('pointerdown',e=>{sig.setPointerCapture(e.pointerId);down(e)});
 sig.addEventListener('pointermove',move);
 sig.addEventListener('pointerup',up);
 sig.addEventListener('pointercancel',up);
-function openSign(){$('modal').classList.add('open');setTimeout(sizeSig,30)}
-function closeSign(){$('modal').classList.remove('open')}
+
+sig.addEventListener('contextmenu',e=>e.preventDefault());
+['touchstart','touchmove','touchend','touchcancel'].forEach(type=>{
+  sig.addEventListener(type,e=>{if(e.cancelable)e.preventDefault();},{passive:false});
+});
+$('modal').addEventListener('touchmove',e=>{if(e.cancelable)e.preventDefault();},{passive:false});
+
+function openSign(){
+  const sy=window.scrollY||window.pageYOffset||0;
+  document.body.dataset.signatureScrollY=String(sy);
+  document.body.style.top=`-${sy}px`;
+  document.documentElement.classList.add('signature-open');
+  document.body.classList.add('signature-open');
+  $('modal').classList.add('open');
+  requestAnimationFrame(()=>requestAnimationFrame(sizeSig));
+}
+function closeSign(){
+  $('modal').classList.remove('open');
+  const sy=parseInt(document.body.dataset.signatureScrollY||'0',10);
+  document.documentElement.classList.remove('signature-open');
+  document.body.classList.remove('signature-open');
+  document.body.style.top='';
+  delete document.body.dataset.signatureScrollY;
+  window.scrollTo(0,sy);
+}
 function clearSig(){ctx.clearRect(0,0,sig.width,sig.height);signed=false}
 function saveSig(){if(!signed){alert('請先簽名 / Please sign first');return}const im=$('signImage');im.src=sig.toDataURL('image/png');im.style.display='block';$('signHint').style.display='none';closeSign()}
 function v(id){return $(id).value.trim()}
@@ -647,7 +759,7 @@ async function downloadPDF(){
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v48_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v50_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
