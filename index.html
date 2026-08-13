@@ -763,7 +763,7 @@ async function downloadPDF(){
  let sy=y+H*6+18;
 
  // Full authorization block — same meaning/content as webpage
- const consentH=535;
+ const consentH=610;
  g.fillStyle='#fff7dc';g.strokeStyle='#d8bf6c';g.lineWidth=2;
  g.fillRect(x,sy,W,consentH);g.strokeRect(x,sy,W,consentH);
 
@@ -842,7 +842,7 @@ async function downloadPDF(){
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v59_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v60_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
