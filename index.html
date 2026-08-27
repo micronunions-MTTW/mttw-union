@@ -29,7 +29,7 @@ button{border:0;border-radius:10px;padding:12px 18px;font-size:16px;font-weight:
 .header{text-align:center;padding:26px 22px 20px;border-bottom:4px solid var(--blue)}
 .header h1{font-size:34px;margin:0}.header .en{font-size:22px;font-weight:800;color:var(--blue);margin-top:7px}.header .sub{font-size:23px;font-weight:800;margin-top:12px}
 .form{padding:24px 28px 32px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.field.full{grid-column:1/-1}.field label{display:block;font-size:16px;font-weight:850;line-height:1.25;margin-bottom:7px}.field label small{display:block;font-size:13px;color:#5e6870;margin-top:3px;font-weight:650}.req:after{content:" *";color:#c40000}
+.field.full{grid-column:1/-1}.field label{display:block;font-size:16px;font-weight:850;line-height:1.25;margin-bottom:7px}.field label .label-main{display:inline}.field label .required-star{display:inline;color:#c40000;margin-left:4px}.field label small{display:block;font-size:13px;color:#5e6870;margin-top:3px;font-weight:650}.req:after{content:none}.sign-date-field label{display:flex;align-items:baseline;gap:6px;flex-wrap:nowrap}.sign-date-field label .required-star{margin-left:0}.sign-date-field label small{display:inline;margin-top:0}
 input,select{width:100%;border:1.5px solid #aeb9c1;border-radius:10px;padding:12px 13px;font-size:17px;background:#fff;outline:none}
 input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(11,102,143,.12)}
 .date3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
@@ -45,7 +45,7 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(11,1
 .feeitem{margin-top:9px}
 .feeitem strong{color:#111}
 .feeitem .en{display:block;margin-top:3px;color:#4d5c65;font-size:14px}
-.signrow{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:end;margin-top:22px}
+.signrow{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start;margin-top:22px}
 .signpreview{display:flex;flex-direction:column;align-items:flex-start}
 .signpreview-label{font-weight:850;margin-bottom:8px;line-height:1.25}
 .signpreview-label .en{font-weight:800}
@@ -96,7 +96,7 @@ input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(11,1
   margin-top:4px;
   padding-left:0;
 }
-.note{margin-top:18px;color:#66727a;font-size:13px;line-height:1.55}
+.note{margin-top:18px;color:#66727a;font-size:19px;line-height:1.9}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}.modal.open{display:flex}
 .dialog{width:min(760px,100%);background:#fff;border-radius:16px;padding:20px}.dialog h2{margin:0 0 13px}
 canvas#sigCanvas{width:100%;height:330px;border:2px solid #c8d1d7;border-radius:10px;background:#fff;touch-action:none}
@@ -356,18 +356,18 @@ body.signature-open{
 <section class="form">
 <button type="button" class="secondary back-intro" onclick="backToIntro()">← 返回入會說明 / Back to Membership Information</button>
 <div class="grid">
-  <div class="field"><label class="req">姓名<small>Name</small></label><input id="name"></div>
-  <div class="field"><label class="req">性別<small>Gender</small></label><select id="gender"><option value="">請選擇 / Select</option><option>男 / Male</option><option>女 / Female</option><option>其他 / Other</option><option>不透露 / Prefer not to say</option></select></div>
-  <div class="field"><label class="req">工號<small>Worker No.</small></label><input id="workerNo"></div>
-  <div class="field"><label class="req">身分證（護照 ID）<small>National ID / Passport ID</small></label><input id="nationalId" autocomplete="off"></div>
-  <div class="field"><label class="req">出生年月日（西元）<small>Birthdate (Gregorian)</small></label><div class="date3"><input id="birthY" inputmode="numeric" placeholder="年 / Year"><input id="birthM" inputmode="numeric" placeholder="月 / Month"><input id="birthD" inputmode="numeric" placeholder="日 / Day"></div></div>
-  <div class="field"><label class="req">單位／部門<small>Workplace / Department</small></label><input id="department"></div>
-  <div class="field"><label class="req">公司 Email<small>Company Email</small></label><input id="companyEmail" type="email" placeholder="name@micron.com"></div>
-  <div class="field"><label class="req">私人 Email<small>Personal Email</small></label><input id="personalEmail" type="email" placeholder="name@example.com"></div>
-  <div class="field"><label class="req">班別<small>Shift</small></label><input id="shift" placeholder="例如：日班 / 夜班"></div>
-  <div class="field"><label class="req">Microsoft Teams<small>Microsoft Teams ID</small></label><input id="teams" placeholder="姓名、帳號或 Email"></div>
-  <div class="field"><label class="req">手機號碼<small>Personal Phone</small></label><input id="mobile" type="tel"></div>
-  <div class="field full"><label class="req">地址<small>Address</small></label><input id="address"></div>
+  <div class="field"><label class="req"><span class="label-main">姓名</span><span class="required-star">*</span><small>Name</small></label><input id="name"></div>
+  <div class="field"><label class="req"><span class="label-main">性別</span><span class="required-star">*</span><small>Gender</small></label><select id="gender"><option value="">請選擇 / Select</option><option>男 / Male</option><option>女 / Female</option><option>其他 / Other</option><option>不透露 / Prefer not to say</option></select></div>
+  <div class="field"><label class="req"><span class="label-main">工號</span><span class="required-star">*</span><small>Worker No.</small></label><input id="workerNo"></div>
+  <div class="field"><label class="req"><span class="label-main">身分證（護照 ID）</span><span class="required-star">*</span><small>National ID / Passport ID</small></label><input id="nationalId" autocomplete="off"></div>
+  <div class="field"><label class="req"><span class="label-main">出生年月日（西元）</span><span class="required-star">*</span><small>Birthdate (Gregorian)</small></label><div class="date3"><input id="birthY" inputmode="numeric" placeholder="年 / Year"><input id="birthM" inputmode="numeric" placeholder="月 / Month"><input id="birthD" inputmode="numeric" placeholder="日 / Day"></div></div>
+  <div class="field"><label class="req"><span class="label-main">單位／部門</span><span class="required-star">*</span><small>Workplace / Department</small></label><input id="department"></div>
+  <div class="field"><label class="req"><span class="label-main">公司 Email</span><span class="required-star">*</span><small>Company Email</small></label><input id="companyEmail" type="email" placeholder="name@micron.com"></div>
+  <div class="field"><label class="req"><span class="label-main">私人 Email</span><span class="required-star">*</span><small>Personal Email</small></label><input id="personalEmail" type="email" placeholder="name@example.com"></div>
+  <div class="field"><label class="req"><span class="label-main">班別</span><span class="required-star">*</span><small>Shift</small></label><input id="shift" placeholder="例如：日班 / 夜班"></div>
+  <div class="field"><label class="req"><span class="label-main">Microsoft Teams</span><span class="required-star">*</span><small>Microsoft Teams ID</small></label><input id="teams" placeholder="姓名、帳號或 Email"></div>
+  <div class="field"><label class="req"><span class="label-main">手機號碼</span><span class="required-star">*</span><small>Personal Phone</small></label><input id="mobile" type="tel"></div>
+  <div class="field full"><label class="req"><span class="label-main">地址</span><span class="required-star">*</span><small>Address</small></label><input id="address"></div>
 </div>
 
 <div class="notice">
@@ -392,7 +392,7 @@ body.signature-open{
 
 
 <div class="signrow">
-  <div class="field"><label class="req">申請日期（西元）<small>Application Date (Gregorian)</small></label><div class="date3"><input id="applyY"><input id="applyM"><input id="applyD"></div></div>
+  <div class="field sign-date-field"><label class="req"><span class="label-main">申請日期（西元）</span><span class="required-star">*</span><small>Application Date (Gregorian)</small></label><div class="date3"><input id="applyY"><input id="applyM"><input id="applyD"></div></div>
   <div class="signpreview">
     <div class="signpreview-label">申請人 / <span class="en">Applicant</span>：<span style="color:#b42318">*</span></div>
     <div class="signbox" id="signBox" onclick="openSign()"><span id="signHint">點擊此處簽名 / Tap to sign</span><img id="signImage" alt="signature"></div>
@@ -400,7 +400,7 @@ body.signature-open{
   </div>
 </div>
 
-<div class="note">PDF 會直接在本機產生，不會上傳個人資料。The PDF is generated locally on your device and no personal data is uploaded.</div>
+<div class="note">PDF 會直接在本機產生，不會上傳個人資料。The PDF is generated locally on your device and no personal data is uploaded.<br>請將 PDF 寄到工會信箱 <a href="mailto:micronunions@gmail.com">micronunions@gmail.com</a>，或自行聯絡工會幹部協助收取。<br>Please email the PDF to the Union mailbox at <a href="mailto:micronunions@gmail.com">micronunions@gmail.com</a>, or contact Union officers for assistance with submission.</div>
 </section>
 </main>
 
@@ -733,15 +733,15 @@ async function downloadPDF(){
  // Header
  g.textAlign='center';g.fillStyle='#111';
  g.font='bold 48px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- g.fillText('台灣美光晶圓企業工會',620,70);
+ g.fillText('台灣美光晶圓企業工會',620,58);
  g.fillStyle='#0b668f';g.font='bold 30px Arial,sans-serif';
- g.fillText('MTTW Micron Union',620,115);
+ g.fillText('MTTW Micron Union',620,100);
  g.fillStyle='#111';g.font='bold 32px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- g.fillText('入會申請書 / Membership Application',620,165);
- g.strokeStyle='#0b668f';drawLine(g,55,198,1185,198,5);
+ g.fillText('入會申請書 / Membership Application',620,145);
+ g.strokeStyle='#0b668f';drawLine(g,55,178,1185,178,5);
 
  // Basic info
- const y=220;
+ const y=195;
  box(g,x,y,half,H,'姓名','Name',v('name'));
  box(g,x+half,y,half,H,'性別','Gender',v('gender'));
 
@@ -762,69 +762,88 @@ async function downloadPDF(){
 
  let sy=y+H*6+18;
 
- // Full authorization block — same meaning/content as webpage
- const consentH=610;
- g.fillStyle='#fff7dc';g.strokeStyle='#d8bf6c';g.lineWidth=2;
- g.fillRect(x,sy,W,consentH);g.strokeRect(x,sy,W,consentH);
-
- g.textAlign='left';g.fillStyle='#8b6500';
+ // Full authorization block — tightened layout for PDF
+ g.textAlign='left';
  const consentTitle='☑ 經常會費薪資代扣同意 / Authorization for Payroll Deduction of Monthly Union Dues';
- let consentTitleSize=28;
+ let consentTitleSize=27;
  g.font=`bold ${consentTitleSize}px "Microsoft JhengHei","Noto Sans TC",sans-serif`;
  while(g.measureText(consentTitle).width>W-40 && consentTitleSize>21){
    consentTitleSize-=1;
    g.font=`bold ${consentTitleSize}px "Microsoft JhengHei","Noto Sans TC",sans-serif`;
  }
- g.fillText(consentTitle,x+20,sy+40);
 
- g.fillStyle='#111';g.font='22px "Microsoft JhengHei","Noto Sans TC",sans-serif';
  const zh1='本人為台灣美光晶圓科技股份有限公司企業工會會員，同意依工會法第 28 條第 3 項規定，自本人提出申請後，於應繳經常會費當月，由台灣美光晶圓科技股份有限公司自本人每月薪資中代扣工會每月經常會費新臺幣 200 元，並將扣取之會費轉交工會。';
  const zh2='如本人當月薪資不足扣款，則依工會其他繳費方式辦理。如本人欲改以其他方式繳納經常會費，將自行向工會提出取消薪資代扣會費之申請，再由公司停止自本人薪資中扣取工會經常會費。';
- let yy=sy+84;
- let arr=wrap(g,zh1,W-40);arr.forEach((t,i)=>g.fillText(t,x+20,yy+i*32));yy+=arr.length*32+16;
- arr=wrap(g,zh2,W-40);arr.forEach((t,i)=>g.fillText(t,x+20,yy+i*32));yy+=arr.length*32+22;
+ const en1='I am a member of the Taiwan Micron Technology, Inc. Enterprise Union. In accordance with Article 28, Paragraph 3 of the Labor Union Act, I authorize Taiwan Micron Technology, Inc., after this application is submitted, to deduct the monthly Union dues of NT$200 from my salary in the month in which the dues are payable and remit the deducted dues to the Union.';
+ const en2='If my salary for a given month is insufficient for the deduction, I will pay the dues using another payment method provided by the Union. If I wish to change to another method of paying the monthly Union dues, I will submit a request to the Union to cancel the payroll deduction authorization, after which the Company will stop deducting the monthly Union dues from my salary.';
 
- g.fillStyle='#075b82';g.font='bold 24px Arial,sans-serif';g.fillText('English',x+20,yy);yy+=34;
- g.fillStyle='#4f5961';g.font='18px Arial,sans-serif';
+ g.fillStyle='#111';
+ g.font='21px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+ const zh1Lines=wrap(g,zh1,W-40);
+ const zh2Lines=wrap(g,zh2,W-40);
 
- function drawEn(text,startY){
+ function enLines(text){
    const words=text.split(' ');let line='',lines=[];
    for(const word of words){
      const t=line?line+' '+word:word;
      if(g.measureText(t).width>W-40&&line){lines.push(line);line=word}else line=t;
    }
    if(line)lines.push(line);
-   lines.forEach((t,i)=>g.fillText(t,x+20,startY+i*24));
-   return startY+lines.length*24;
+   return lines;
  }
 
- const en1='I am a member of the Taiwan Micron Technology, Inc. Enterprise Union. In accordance with Article 28, Paragraph 3 of the Labor Union Act, I authorize Taiwan Micron Technology, Inc., after this application is submitted, to deduct the monthly Union dues of NT$200 from my salary in the month in which the dues are payable and remit the deducted dues to the Union.';
- const en2='If my salary for a given month is insufficient for the deduction, I will pay the dues using another payment method provided by the Union. If I wish to change to another method of paying the monthly Union dues, I will submit a request to the Union to cancel the payroll deduction authorization, after which the Company will stop deducting the monthly Union dues from my salary.';
- yy=drawEn(en1,yy)+16;
- yy=drawEn(en2,yy);
+ g.font='17px Arial,sans-serif';
+ const en1Lines=enLines(en1);
+ const en2Lines=enLines(en2);
 
- sy+=consentH+10;
+ let cursor=sy+38;
+ const titleY=cursor;
+ cursor+=34;
+ const zh1Y=cursor;
+ cursor+=zh1Lines.length*30+12;
+ const zh2Y=cursor;
+ cursor+=zh2Lines.length*30+18;
+ const enLabelY=cursor;
+ cursor+=30;
+ const en1Y=cursor;
+ cursor+=en1Lines.length*22+12;
+ const en2Y=cursor;
+ cursor+=en2Lines.length*22;
+ const consentH=Math.ceil(cursor-sy+24);
 
- 
- // Fee information omitted here to avoid duplication with the authorization content.
+ g.fillStyle='#fff7dc';g.strokeStyle='#d8bf6c';g.lineWidth=2;
+ g.fillRect(x,sy,W,consentH);g.strokeRect(x,sy,W,consentH);
 
+ g.fillStyle='#8b6500';
+ g.font=`bold ${consentTitleSize}px "Microsoft JhengHei","Noto Sans TC",sans-serif`;
+ g.fillText(consentTitle,x+20,titleY);
+
+ g.fillStyle='#111';g.font='21px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+ zh1Lines.forEach((t,i)=>g.fillText(t,x+20,zh1Y+i*30));
+ zh2Lines.forEach((t,i)=>g.fillText(t,x+20,zh2Y+i*30));
+
+ g.fillStyle='#075b82';g.font='bold 23px Arial,sans-serif';g.fillText('English',x+20,enLabelY);
+ g.fillStyle='#4f5961';g.font='17px Arial,sans-serif';
+ en1Lines.forEach((t,i)=>g.fillText(t,x+20,en1Y+i*22));
+ en2Lines.forEach((t,i)=>g.fillText(t,x+20,en2Y+i*22));
+
+ sy+=consentH+18;
 
  // Date and signature — open layout without heavy outer boxes
- sy+=28;
  g.textAlign='left';
  g.fillStyle='#111';
  g.font='bold 24px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- g.fillText('申請日期（西元）',x,sy+25);
+ g.fillText('申請日期（西元）',x,sy+24);
  g.fillStyle='#59646d';
  g.font='16px Arial,sans-serif';
- g.fillText('Application Date (Gregorian)',x,sy+49);
+ g.fillText('Application Date (Gregorian)',x,sy+48);
  g.fillStyle='#111';
- g.font='bold 40px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- g.fillText(`${v('applyY')} 年 ${v('applyM')} 月 ${v('applyD')} 日`,x+32,sy+145);
+ g.font='bold 30px "Microsoft JhengHei","Noto Sans TC",sans-serif';
+ g.fillText(`${v('applyY')} 年 ${v('applyM')} 月 ${v('applyD')} 日`,x+28,sy+112);
 
  g.fillStyle='#111';
  g.font='bold 24px "Microsoft JhengHei","Noto Sans TC",sans-serif';
- g.fillText('申請人 / Applicant：',x+610,sy+25);
+ g.fillText('申請人 / Applicant：',x+610,sy+24);
 
  const im=$('signImage');
  if(!im.complete){
@@ -834,21 +853,51 @@ async function downloadPDF(){
    });
  }
  if(im.decode){await im.decode().catch(()=>{});}
- drawSignaturePreserve(g,im,x+650,sy+45,380,105);
+ drawSignaturePreserve(g,im,x+655,sy+44,355,84);
  g.textAlign='center';g.font='18px Arial,sans-serif';g.fillStyle='#555';
- g.fillText('（簽章 / Signature / Seal）',x+840,sy+176);
+ g.fillText('（簽章 / Signature / Seal）',x+832,sy+146);
 
- g.textAlign='left';g.font='15px "Microsoft JhengHei","Noto Sans TC",sans-serif';g.fillStyle='#666';
- g.fillText('本文件由申請人自行填寫並以電子簽名確認。',55,1734);
- g.font='14px Arial,sans-serif';g.fillStyle='#777';
- g.fillText('This document is completed by the applicant and confirmed with an electronic signature.',55,1758);
+ // Divider between signature/date section and footer notes
+ const dividerY = sy + 176;
+ g.strokeStyle='#b7bec4';
+ g.lineWidth=1.5;
+ g.beginPath();
+ g.moveTo(x, dividerY);
+ g.lineTo(x+W, dividerY);
+ g.stroke();
+
+ // Footer notes — larger and moved into bottom whitespace
+ function drawWrappedLine(text,startX,startY,maxWidth,lineHeight,font,fill){
+   g.textAlign='left';
+   g.font=font;g.fillStyle=fill;
+   const pieces=font.includes('Arial')?text.split(' '):[text];
+   let lines=[];
+   if(pieces.length===1 && !font.includes('Arial')){
+     lines=wrap(g,text,maxWidth);
+   }else{
+     let line='';
+     for(const part of pieces){
+       const test=line?line+' '+part:part;
+       if(g.measureText(test).width>maxWidth && line){lines.push(line);line=part;} else line=test;
+     }
+     if(line)lines.push(line);
+   }
+   lines.forEach((t,i)=>g.fillText(t,startX,startY+i*lineHeight));
+   return startY+lines.length*lineHeight;
+ }
+
+ let footY=dividerY+26;
+ footY=drawWrappedLine('本文件由申請人自行填寫並以電子簽名確認。',x+2,footY,W-4,28,'19px "Microsoft JhengHei","Noto Sans TC",sans-serif','#666')+6;
+ footY=drawWrappedLine('This document is completed by the applicant and confirmed with an electronic signature.',x+2,footY,W-4,25,'18px Arial,sans-serif','#777')+10;
+ footY=drawWrappedLine('請將 PDF 寄到工會信箱 micronunions@gmail.com，或自行聯絡工會幹部協助收取。',x+2,footY,W-4,28,'19px "Microsoft JhengHei","Noto Sans TC",sans-serif','#666')+6;
+ drawWrappedLine('Please email the PDF to the Union mailbox at micronunions@gmail.com, or contact Union officers for assistance with submission.',x+2,footY,W-4,25,'18px Arial,sans-serif','#777');
 
  // Export single-page PDF
  const data=c.toDataURL('image/jpeg',0.97),bin=atob(data.split(',')[1]),bytes=new Uint8Array(bin.length);
  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
  const blob=jpegPdf(bytes,c.width,c.height),a=document.createElement('a');
  a.href=URL.createObjectURL(blob);
- a.download=`MTTW_入會申請_v61_${v('workerNo')}_${v('name')}.pdf`;
+ a.download=`MTTW_入會申請_v68_${v('workerNo')}_${v('name')}.pdf`;
  document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
