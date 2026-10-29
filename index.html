@@ -612,7 +612,27 @@ function saveSig(){
  closeSign();
 }
 function v(id){return $(id).value.trim()}
-function validate(){const req=[['name','姓名'],['gender','性別'],['workerNo','工號'],['nationalId','身分證（護照 ID）'],['birthY','出生年'],['birthM','出生月'],['birthD','出生日'],['department','單位／部門'],['companyEmail','公司 Email'],['personalEmail','私人 Email'],['shift','班別'],['teams','Microsoft Teams'],['mobile','手機號碼'],['address','地址'],['applyY','申請年'],['applyM','申請月'],['applyD','申請日']];for(const [id,n] of req){if(!v(id)){alert('請填寫：'+n);$(id).focus();return false}}if(!$('agree').checked){alert('請勾選同意條款');return false}if($('signImage').style.display!=='block'){alert('請完成電子簽名');return false}return true}
+function validate(){
+ const req=[['name','姓名'],['gender','性別'],['workerNo','工號'],['nationalId','身分證（護照 ID）'],['birthY','出生年'],['birthM','出生月'],['birthD','出生日'],['department','單位／部門'],['companyEmail','公司 Email'],['personalEmail','私人 Email'],['shift','班別'],['teams','Microsoft Teams'],['mobile','手機號碼'],['address','地址'],['applyY','申請年'],['applyM','申請月'],['applyD','申請日']];
+ for(const [id,n] of req){
+   if(!v(id)){alert('請填寫：'+n);$(id).focus();return false}
+ }
+ const companyEmail=v('companyEmail');
+ const personalEmail=v('personalEmail');
+ if(!/^[^@\s]+@micron\.com$/i.test(companyEmail)){
+   alert('公司 Email 格式錯誤，請輸入 @micron.com 的公司 Email。\nCompany Email must end with @micron.com');
+   $('companyEmail').focus();
+   return false;
+ }
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(personalEmail)){
+   alert('私人 Email 格式錯誤，請輸入完整 Email。\nPlease enter a valid personal Email.');
+   $('personalEmail').focus();
+   return false;
+ }
+ if(!$('agree').checked){alert('請勾選同意條款');return false}
+ if($('signImage').style.display!=='block'){alert('請完成電子簽名');return false}
+ return true
+}
 function wrap(ctx,text,maxW){const out=[];let line='';for(const ch of text){const t=line+ch;if(ctx.measureText(t).width>maxW&&line){out.push(line);line=ch}else line=t}if(line)out.push(line);return out}
 function drawLine(ctx,x1,y1,x2,y2,w=1){ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
 function box(ctx,x,y,w,h,labelZh,labelEn,value){
@@ -963,8 +983,15 @@ async function waitForConfirmedSubmission(applicationId,maxWaitMs=45000){
    try{
      const result=await querySubmissionStatus(applicationId);
      if(result && result.ok && result.found) return result;
+     if(result && result.error){
+       throw new Error(result.error);
+     }
    }catch(err){
      lastError=err;
+     // Known backend validation/storage errors should be shown immediately.
+     if(err && err.message && err.message !== 'Status check timeout' && err.message !== 'Unable to check submission status'){
+       throw err;
+     }
    }
    await new Promise(r=>setTimeout(r,2200));
  }
@@ -1037,11 +1064,18 @@ async function submitApplication(){
      status.textContent='目前無法確認工會系統已收到資料。請先不要重複送出，請聯絡工會確認。';
      status.style.color='#b42318';
    }
+   const msg=(err?.message||String(err));
+   const friendly={
+     'Invalid company Email.':'公司 Email 必須使用 @micron.com 格式。',
+     'Invalid personal Email.':'私人 Email 格式不正確。',
+     'Payroll deduction consent is required.':'尚未勾選薪資代扣同意。',
+     'PDF file is too large.':'PDF 檔案過大，無法送出。',
+     'PDF payload is too large.':'PDF 資料過大，無法送出。'
+   }[msg] || msg;
    alert(
-     '目前無法確認申請是否成功送達。\n\n'+
-     '請先不要重複送出，以免產生重複申請。\n'+
-     '請聯絡工會確認，或稍後重新整理後再試。\n\n'+
-     '錯誤資訊：'+(err?.message||err)
+     '入會申請尚未成功送達。\n\n'+
+     '原因：'+friendly+'\n\n'+
+     '請修正後再送出；若仍失敗，請聯絡工會。'
    );
  }finally{
    btn.disabled=false;
