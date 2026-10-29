@@ -907,10 +907,42 @@ function makeApplicationId(){
 
 function postPayloadViaHiddenForm(payload){
  return new Promise((resolve,reject)=>{
-   try{
-     const iframe=$('submitTransportFrame');
-     if(!iframe) throw new Error('Submission transport is not available.');
+   const iframe=$('submitTransportFrame');
+   if(!iframe){
+     reject(new Error('Submission transport is not available.'));
+     return;
+   }
 
+   const timeoutMs=60000;
+   const timer=setTimeout(()=>{
+     cleanup();
+     reject(new Error('工會系統已送出資料，但沒有收到後端確認訊號。請先查看雲端/信箱，不要立刻重複送出。'));
+   },timeoutMs);
+
+   function cleanup(){
+     clearTimeout(timer);
+     window.removeEventListener('message',onMessage);
+   }
+
+   function onMessage(event){
+     // Only accept a response from the hidden submission iframe itself.
+     if(event.source!==iframe.contentWindow) return;
+     const data=event.data;
+     if(!data || data.source!=='MTTW_APPS_SCRIPT') return;
+     if(data.applicationId!==payload.applicationId) return;
+
+     cleanup();
+
+     if(data.ok){
+       resolve(data);
+     }else{
+       reject(new Error(data.error||'Submission failed.'));
+     }
+   }
+
+   window.addEventListener('message',onMessage);
+
+   try{
      const form=document.createElement('form');
      form.method='POST';
      form.action=PRODUCTION_WEB_APP_URL;
@@ -925,77 +957,14 @@ function postPayloadViaHiddenForm(payload){
      form.appendChild(input);
 
      document.body.appendChild(form);
-
-     // Cross-origin HTML form POST is intentionally used instead of fetch/no-cors.
-     // This is more reliable on iPhone Safari for Apps Script Web Apps.
      form.submit();
 
-     setTimeout(()=>{
-       form.remove();
-       resolve();
-     },800);
+     setTimeout(()=>form.remove(),1500);
    }catch(err){
+     cleanup();
      reject(err);
    }
  });
-}
-
-function querySubmissionStatus(applicationId){
- return new Promise((resolve,reject)=>{
-   const cb='__mttwStatus_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-   const script=document.createElement('script');
-   const timer=setTimeout(()=>{
-     cleanup();
-     reject(new Error('Status check timeout'));
-   },8000);
-
-   function cleanup(){
-     clearTimeout(timer);
-     try{delete window[cb]}catch(_){window[cb]=undefined}
-     script.remove();
-   }
-
-   window[cb]=data=>{
-     cleanup();
-     resolve(data||{ok:false});
-   };
-
-   script.onerror=()=>{
-     cleanup();
-     reject(new Error('Unable to check submission status'));
-   };
-
-   script.src=PRODUCTION_WEB_APP_URL
-     +'?action=status'
-     +'&id='+encodeURIComponent(applicationId)
-     +'&callback='+encodeURIComponent(cb)
-     +'&_='+Date.now();
-
-   document.head.appendChild(script);
- });
-}
-
-async function waitForConfirmedSubmission(applicationId,maxWaitMs=45000){
- const started=Date.now();
- let lastError=null;
-
- while(Date.now()-started<maxWaitMs){
-   try{
-     const result=await querySubmissionStatus(applicationId);
-     if(result && result.ok && result.found) return result;
-     if(result && result.error){
-       throw new Error(result.error);
-     }
-   }catch(err){
-     lastError=err;
-     // Known backend validation/storage errors should be shown immediately.
-     if(err && err.message && err.message !== 'Status check timeout' && err.message !== 'Unable to check submission status'){
-       throw err;
-     }
-   }
-   await new Promise(r=>setTimeout(r,2200));
- }
- throw lastError || new Error('Submission could not be confirmed.');
 }
 
 async function submitApplication(){
@@ -1041,11 +1010,9 @@ async function submitApplication(){
      pdfBase64
    };
 
-   await postPayloadViaHiddenForm(payload);
+   if(status) status.textContent='資料送出中，正在等待工會系統完成寫入…';
 
-   if(status) status.textContent='資料已送出，正在等待工會系統確認…';
-
-   const confirmed=await waitForConfirmedSubmission(applicationId);
+   const confirmed=await postPayloadViaHiddenForm(payload);
 
    if(status){
      status.textContent=`入會申請已確認收件：${applicationId}`;
@@ -1061,7 +1028,7 @@ async function submitApplication(){
  }catch(err){
    console.error(err);
    if(status){
-     status.textContent='目前無法確認工會系統已收到資料。請先不要重複送出，請聯絡工會確認。';
+     status.textContent='送出結果尚未確認。若已在雲端或工會信箱看到資料，請勿重複送出。';
      status.style.color='#b42318';
    }
    const msg=(err?.message||String(err));
