@@ -403,15 +403,11 @@ body.signature-open{
 
 <div class="note">
 「儲存 PDF / Save PDF」僅在您的裝置產生 PDF，不會上傳資料。<br>
-「送出入會申請 / Submit Application」會將本表單資料、電子簽名及 PDF 傳送至工會管理的 Google Sheet / Drive；只有系統確認收件後才會顯示送出成功。<br>
-“Save PDF” generates the PDF locally on your device. “Submit Application” sends the form data, electronic signature, and PDF to the Union-managed Google Sheet / Drive. A success message is shown only after the system confirms receipt.
+「送出入會申請 / Submit Application」會將本表單資料、電子簽名及 PDF 傳送至工會系統；完成後會直接顯示正式收件結果與 Application ID。<br>
+“Save PDF” generates the PDF locally on your device. “Submit Application” sends the form data, electronic signature, and PDF to the Union system. The browser then displays the official receipt result and Application ID after processing.
 </div>
 </section>
 </main>
-
-
-<iframe id="submitTransportFrame" name="submitTransportFrame" style="display:none;width:0;height:0;border:0" aria-hidden="true"></iframe>
-
 <div class="modal" id="modal">
  <div class="dialog signature-dialog-clean">
   <canvas id="sigCanvas"></canvas>
@@ -905,66 +901,22 @@ function makeApplicationId(){
  return `MTTW-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;
 }
 
-function postPayloadViaHiddenForm(payload){
- return new Promise((resolve,reject)=>{
-   const iframe=$('submitTransportFrame');
-   if(!iframe){
-     reject(new Error('Submission transport is not available.'));
-     return;
-   }
+function submitPayloadToAppsScript(payload){
+ const form=document.createElement('form');
+ form.method='POST';
+ form.action=PRODUCTION_WEB_APP_URL;
+ form.target='_self';
+ form.style.display='none';
+ form.acceptCharset='UTF-8';
 
-   const timeoutMs=60000;
-   const timer=setTimeout(()=>{
-     cleanup();
-     reject(new Error('工會系統已送出資料，但沒有收到後端確認訊號。請先查看雲端/信箱，不要立刻重複送出。'));
-   },timeoutMs);
+ const input=document.createElement('textarea');
+ input.name='payload';
+ input.value=JSON.stringify(payload);
+ input.style.display='none';
+ form.appendChild(input);
 
-   function cleanup(){
-     clearTimeout(timer);
-     window.removeEventListener('message',onMessage);
-   }
-
-   function onMessage(event){
-     // Only accept a response from the hidden submission iframe itself.
-     if(event.source!==iframe.contentWindow) return;
-     const data=event.data;
-     if(!data || data.source!=='MTTW_APPS_SCRIPT') return;
-     if(data.applicationId!==payload.applicationId) return;
-
-     cleanup();
-
-     if(data.ok){
-       resolve(data);
-     }else{
-       reject(new Error(data.error||'Submission failed.'));
-     }
-   }
-
-   window.addEventListener('message',onMessage);
-
-   try{
-     const form=document.createElement('form');
-     form.method='POST';
-     form.action=PRODUCTION_WEB_APP_URL;
-     form.target='submitTransportFrame';
-     form.style.display='none';
-     form.acceptCharset='UTF-8';
-
-     const input=document.createElement('textarea');
-     input.name='payload';
-     input.value=JSON.stringify(payload);
-     input.style.display='none';
-     form.appendChild(input);
-
-     document.body.appendChild(form);
-     form.submit();
-
-     setTimeout(()=>form.remove(),1500);
-   }catch(err){
-     cleanup();
-     reject(err);
-   }
- });
+ document.body.appendChild(form);
+ form.submit();
 }
 
 async function submitApplication(){
@@ -1010,20 +962,15 @@ async function submitApplication(){
      pdfBase64
    };
 
-   if(status) status.textContent='資料送出中，正在等待工會系統完成寫入…';
-
-   const confirmed=await postPayloadViaHiddenForm(payload);
-
    if(status){
-     status.textContent=`入會申請已確認收件：${applicationId}`;
-     status.style.color='#14804a';
+     status.textContent='正在送交工會系統，完成後將顯示正式收件畫面…';
+     status.style.color='';
    }
 
-   alert(
-     `入會申請已成功送達工會系統。\n`+
-     `Application ID: ${applicationId}\n\n`+
-     `系統已確認資料寫入。工會將依章程及程序辦理後續審查。`
-   );
+   // Standard browser form POST. The page will navigate to Apps Script,
+   // which displays the authoritative success/error result only after backend processing.
+   submitPayloadToAppsScript(payload);
+   return;
 
  }catch(err){
    console.error(err);
