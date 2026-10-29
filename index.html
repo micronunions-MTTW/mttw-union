@@ -260,8 +260,72 @@ body.signature-open{
 }
 </style>
 
+
+<style>
+/* v7: immediate full-screen submit feedback for mobile/desktop */
+#submitOverlay{
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(14,28,38,.72);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+}
+#submitOverlay.show{display:flex}
+#submitOverlay .submit-box{
+  width:min(92vw,430px);
+  background:#fff;
+  border-radius:20px;
+  padding:28px 24px;
+  text-align:center;
+  box-shadow:0 18px 55px rgba(0,0,0,.28);
+}
+#submitOverlay .submit-spinner{
+  width:54px;
+  height:54px;
+  margin:0 auto 18px;
+  border:6px solid #dbe8ee;
+  border-top-color:#0f5f7f;
+  border-radius:50%;
+  animation:mttw-spin .8s linear infinite;
+}
+#submitOverlay .submit-title{
+  margin:0 0 10px;
+  font-size:22px;
+  font-weight:800;
+  color:#173444;
+}
+#submitOverlay .submit-stage{
+  margin:0;
+  font-size:16px;
+  line-height:1.6;
+  color:#3d4c56;
+}
+#submitOverlay .submit-note{
+  margin:14px 0 0;
+  font-size:13px;
+  line-height:1.55;
+  color:#6b7680;
+}
+@keyframes mttw-spin{to{transform:rotate(360deg)}}
+</style>
+
 </head>
 <body>
+
+<div id="submitOverlay" role="status" aria-live="polite" aria-busy="true">
+  <div class="submit-box">
+    <div class="submit-spinner" aria-hidden="true"></div>
+    <h2 class="submit-title">正在送出入會申請</h2>
+    <p class="submit-stage" id="submitOverlayStage">正在建立 PDF，請稍候…</p>
+    <p class="submit-note">請勿關閉頁面、返回上一頁或重複點擊送出。<br>Please keep this page open while the application is being submitted.</p>
+  </div>
+</div>
+
 <div class="watermark-mid">僅供台灣美光晶圓企業工會入會使用 / For MTTW Micron Union Membership Use Only</div>
 
 <section class="intro-page" id="introPage">
@@ -901,6 +965,41 @@ function makeApplicationId(){
  return `MTTW-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}-${Math.random().toString(36).slice(2,7).toUpperCase()}`;
 }
 
+function showSubmitOverlay(stageText){
+ const overlay=$('submitOverlay');
+ const stage=$('submitOverlayStage');
+ if(stage && stageText) stage.textContent=stageText;
+ if(overlay){
+   overlay.classList.add('show');
+   overlay.setAttribute('aria-busy','true');
+ }
+ document.documentElement.style.overflow='hidden';
+ document.body.style.overflow='hidden';
+}
+
+function updateSubmitOverlay(stageText){
+ const stage=$('submitOverlayStage');
+ if(stage && stageText) stage.textContent=stageText;
+}
+
+function hideSubmitOverlay(){
+ const overlay=$('submitOverlay');
+ if(overlay){
+   overlay.classList.remove('show');
+   overlay.setAttribute('aria-busy','false');
+ }
+ document.documentElement.style.overflow='';
+ document.body.style.overflow='';
+}
+
+function allowOverlayToPaint(){
+ return new Promise(resolve=>{
+   requestAnimationFrame(()=>{
+     requestAnimationFrame(()=>setTimeout(resolve,40));
+   });
+ });
+}
+
 function submitPayloadToAppsScript(payload){
  const form=document.createElement('form');
  form.method='POST';
@@ -929,13 +1028,25 @@ async function submitApplication(){
  const btn=$('submitApplicationBtn');
  const status=$('submitStatus');
  const oldText=btn.textContent;
+ let navigating=false;
+
  btn.disabled=true;
  btn.textContent='送出中 / Submitting...';
- if(status) status.textContent='正在建立 PDF 並送出入會申請，請勿關閉此頁…';
+ if(status){
+   status.textContent='正在建立 PDF 並送出入會申請，請勿關閉此頁…';
+   status.style.color='';
+ }
+
+ showSubmitOverlay('正在建立 PDF，請稍候…');
 
  try{
+   await allowOverlayToPaint();
+
    const pdf=await downloadPDF(false);
    if(!pdf) throw new Error('PDF 建立失敗');
+
+   updateSubmitOverlay('PDF 已建立，正在準備安全傳送…');
+   await allowOverlayToPaint();
 
    const pdfBase64=await blobToBase64(pdf.blob);
    const applicationId=makeApplicationId();
@@ -966,34 +1077,43 @@ async function submitApplication(){
      status.textContent='正在送交工會系統，完成後將顯示正式收件畫面…';
      status.style.color='';
    }
+   updateSubmitOverlay('正在傳送至工會系統，完成後會自動顯示收件結果…');
 
-   // Standard browser form POST. The page will navigate to Apps Script,
-   // which displays the authoritative success/error result only after backend processing.
+   await allowOverlayToPaint();
+
+   navigating=true;
    submitPayloadToAppsScript(payload);
    return;
 
  }catch(err){
    console.error(err);
+   hideSubmitOverlay();
+
    if(status){
-     status.textContent='送出結果尚未確認。若已在雲端或工會信箱看到資料，請勿重複送出。';
+     status.textContent='入會申請尚未成功送達，請依提示修正後再試。';
      status.style.color='#b42318';
    }
+
    const msg=(err?.message||String(err));
    const friendly={
      'Invalid company Email.':'公司 Email 必須使用 @micron.com 格式。',
      'Invalid personal Email.':'私人 Email 格式不正確。',
      'Payroll deduction consent is required.':'尚未勾選薪資代扣同意。',
      'PDF file is too large.':'PDF 檔案過大，無法送出。',
-     'PDF payload is too large.':'PDF 資料過大，無法送出。'
+     'PDF payload is too large.':'PDF 資料過大，無法送出。',
+     'PDF 建立失敗':'PDF 建立失敗，請重新整理頁面後再試。'
    }[msg] || msg;
+
    alert(
      '入會申請尚未成功送達。\n\n'+
      '原因：'+friendly+'\n\n'+
      '請修正後再送出；若仍失敗，請聯絡工會。'
    );
  }finally{
-   btn.disabled=false;
-   btn.textContent=oldText;
+   if(!navigating){
+     btn.disabled=false;
+     btn.textContent=oldText;
+   }
  }
 }
 
